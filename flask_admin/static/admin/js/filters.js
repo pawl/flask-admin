@@ -66,11 +66,28 @@ var AdminFilters = function(element, filtersElement, filterGroups) {
             $('<td/>').append($select)
         );
 
-        $select.select2({width: 'resolve'});
+        // on change, get the subfilter based on the index of the added element, then modify the input field (turn into date range if necessary)
+        $select.select2({width: 'resolve'}).on("change", function(e) { styleFilterInput(subfilters[e.added.element[0].index], $el.find('input').last()); });
 
-        // Input
-        var filter = subfilters[0];
-
+        // add styling to input field, accommodates filters that change the type of the field 
+        function styleFilterInput(filter, field) {
+            if (filter.type) {
+                field.attr('data-role', filter.type);
+                if ((filter.type == "datepicker") || (filter.type == "daterangepicker")) {
+                    field.attr('data-date-format', "YYYY-MM-DD");
+                }
+                else if ((filter.type == "datetimepicker") || (filter.type == "datetimerangepicker")) {
+                    field.attr('data-date-format', "YYYY-MM-DD HH:mm:ss");
+                }
+                else if ((filter.type == "timepicker")  || (filter.type == "timerangepicker")) {
+                    field.attr('data-date-format', "HH:mm:ss");
+                }
+                faForm.applyStyle(field, filter.type);
+            }
+        }
+        
+        // initial filter creation
+        filter = subfilters[0];
         var $field;
 
         if (filter.options) {
@@ -90,20 +107,8 @@ var AdminFilters = function(element, filtersElement, filterGroups) {
                         .attr('name', makeName(filter.arg));
             $el.append($('<td/>').append($field));
         }
-
-        if (filter.type) {
-            $field.attr('data-role', filter.type);
-            if (filter.type == "datepicker") {
-                $field.attr('data-date-format', "YYYY-MM-DD");
-            }
-            else if (filter.type == "datetimepicker") {
-                $field.attr('data-date-format', "YYYY-MM-DD HH:mm:ss");
-            }
-			else if (filter.type == "timepicker") {
-                $field.attr('data-date-format', "HH:mm:ss");
-            }
-            faForm.applyStyle($field, filter.type);
-        }
+        
+        styleFilterInput(filter, $field);
     }
 
     $('a.filter', filtersElement).click(function() {

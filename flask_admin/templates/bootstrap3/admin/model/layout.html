@@ -46,7 +46,12 @@
                         {%- endfor %}
                     </select>
                     {%- else -%}
-                    <input name="flt{{n}}_{{ filter_arg }}" type="text" value="{{ value or '' }}" class="filter-val  form-control"{% if filter.data_type %} data-role="{{ filter.data_type }}"{% endif %} {% if filter.data_type == "datepicker" %}data-date-format="YYYY-MM-DD"{% elif filter.data_type == "datetimepicker" %}data-date-format="YYYY-MM-DD HH:mm:ss"{% elif filter.data_type == "timepicker" %}data-date-format="HH:mm:ss"{% endif %}></input>
+                    <input name="flt{{n}}_{{ filter_arg }}" type="text" value="{{ value or '' }}" class="filter-val  form-control"
+                    {% if filter.data_type %}data-role="{{ filter.data_type }}"{% endif %} 
+                    {% if filter.data_type in ["datepicker", "daterangepicker"] %}data-date-format="YYYY-MM-DD"
+                    {% elif filter.data_type in ["datetimepicker", "datetimerangepicker"] %}data-date-format="YYYY-MM-DD HH:mm:ss"
+                    {% elif filter.data_type in ["timepicker", "timerangepicker"] %}data-date-format="HH:mm:ss"
+                    {% endif %}></input>
                     {%- endif -%}
                 </td>
             </tr>

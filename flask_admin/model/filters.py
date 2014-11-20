@@ -106,8 +106,11 @@ class BaseDateFilter(BaseFilter):
                                              data_type='datepicker')
 
     def validate(self, value):
-        # TODO: Validation
-        return True
+        try:
+            self.clean(value)
+            return True
+        except ValueError:
+            return False
 
 
 class BaseDateTimeFilter(BaseFilter):
@@ -120,8 +123,11 @@ class BaseDateTimeFilter(BaseFilter):
                                                  data_type='datetimepicker')
 
     def validate(self, value):
-        # TODO: Validation
-        return True
+        try:
+            self.clean(value)
+            return True
+        except ValueError:
+            return False
         
         
 class BaseTimeFilter(BaseFilter):
@@ -134,8 +140,11 @@ class BaseTimeFilter(BaseFilter):
                                              data_type='timepicker')
 
     def validate(self, value):
-        # TODO: Validation
-        return True
+        try:
+            self.clean(value)
+            return True
+        except ValueError:
+            return False
 
 
 def convert(*args):

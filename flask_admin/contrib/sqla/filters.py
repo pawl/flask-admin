@@ -93,24 +93,53 @@ class DateEqualFilter(FilterEqual, filters.BaseDateFilter):
     def clean(self, value):
         return datetime.datetime.strptime(value, '%Y-%m-%d').date()
 
-    def validate(self, value):
-        try:
-            self.clean(value)
-            return True
-        except ValueError:
-            return False
-            
+        
+class DateNotEqualFilter(FilterNotEqual, DateEqualFilter):
+    pass
+
+        
+class DateInRangeFilter(BaseSQLAFilter):
+    def apply(self, query, value):
+        value = [datetime.datetime.strptime(range, '%Y-%m-%d') for range in value.split(' to ')]
+        return query.filter(self.column.between(value[0], value[1]))
+
+    def operation(self):
+        return lazy_gettext('in range')
+
+
+class DateNotInRangeFilter(BaseSQLAFilter):
+    def apply(self, query, value):
+        # TODO: find alternate "not between" query, ~between isn't possible until sqlalchemy 1.0.0
+        return query.filter(~self.column.between(value[0], value[1]))
+
+    def operation(self):
+        return lazy_gettext('not in range')
+        
             
 class DateTimeEqualFilter(FilterEqual, filters.BaseDateTimeFilter):
     def clean(self, value):
         return datetime.datetime.strptime(value, '%Y-%m-%d %H:%M:%S')
 
-    def validate(self, value):
-        try:
-            self.clean(value)
-            return True
-        except ValueError:
-            return False
+        
+class DateTimeNotEqualFilter(FilterNotEqual, DateTimeEqualFilter):
+    pass
+
+class DateTimeInRangeFilter(BaseSQLAFilter):
+    def apply(self, query, value):
+        value = [datetime.datetime.strptime(range, '%Y-%m-%d %H:%M:%S') for range in value.split(' to ')]
+        return query.filter(self.column.between(value[0], value[1]))
+
+    def operation(self):
+        return lazy_gettext('in range')
+
+        
+class DateTimeNotInRangeFilter(BaseSQLAFilter):            
+    def apply(self, query, value):
+        return query.filter(~self.column.between(value[0], value[1]))
+
+    def operation(self):
+        return lazy_gettext('not in range')
+        
         
 class TimeEqualFilter(FilterEqual, filters.BaseTimeFilter):
     def clean(self, value):
@@ -118,15 +147,32 @@ class TimeEqualFilter(FilterEqual, filters.BaseTimeFilter):
         return datetime.time(timetuple.tm_hour,
                              timetuple.tm_min,
                              timetuple.tm_sec)
-    
-    def validate(self, value):
-        try:
-            self.clean(value)
-            return True
-        except ValueError:
-            return False
-    
 
+class TimeNotEqualFilter(FilterNotEqual, TimeEqualFilter):
+    pass
+
+class TimeInRangeFilter(BaseSQLAFilter):
+    def apply(self, query, value):
+        timetuples = [time.strptime(range, '%H:%M:%S') 
+                      for range in value.split(' to ')]
+        value = [datetime.time(timetuple.tm_hour,
+                             timetuple.tm_min,
+                             timetuple.tm_sec)
+                             for timetuple in timetuples]
+        return query.filter(self.column.between(value[0], value[1]))
+
+    def operation(self):
+        return lazy_gettext('in range')
+        
+
+class TimeNotInRangeFilter(BaseSQLAFilter):            
+    def apply(self, query, value):
+        return query.filter(~self.column.between(value[0], value[1]))
+
+    def operation(self):
+        return lazy_gettext('not in range')
+        
+            
 # Base SQLA filter field converter
 class FilterConverter(filters.BaseFilterConverter):
     strings = (FilterEqual, FilterNotEqual, FilterLike, FilterNotLike)
@@ -137,7 +183,6 @@ class FilterConverter(filters.BaseFilterConverter):
     def convert(self, type_name, column, name, **kwargs):
         if type_name.lower() in self.converters:
             return self.converters[type_name.lower()](column, name, **kwargs)
-
         return None
 
     @filters.convert('string', 'unicode', 'text', 'unicodetext', 'varchar')
@@ -155,23 +200,24 @@ class FilterConverter(filters.BaseFilterConverter):
     @filters.convert('date')
     def conv_date(self, column, name, **kwargs):
         return [DateEqualFilter(column, name),
-                FilterNotEqual(column, name, data_type='datepicker', **kwargs),
-                FilterGreater(column, name, data_type='datepicker', **kwargs),
-                FilterSmaller(column, name, data_type='datepicker', **kwargs)]
+                DateNotEqualFilter(column, name),
+                DateInRangeFilter(column, name, data_type='daterangepicker'),
+                DateNotInRangeFilter(column, name, data_type='daterangepicker')]
+                # TODO: add > and < back
 
     @filters.convert('datetime')
     def conv_datetime(self, column, name, **kwargs):
         return [DateTimeEqualFilter(column, name),
-                FilterNotEqual(column, name, data_type='datetimepicker', **kwargs),
-                FilterGreater(column, name, data_type='datetimepicker', **kwargs),
-                FilterSmaller(column, name, data_type='datetimepicker', **kwargs)]
+                DateTimeNotEqualFilter(column, name),
+                DateTimeInRangeFilter(column, name, data_type='datetimerangepicker'),
+                DateTimeNotInRangeFilter(column, name, data_type='datetimerangepicker')]
                 
     @filters.convert('time')
     def conv_time(self, column, name, **kwargs):
         return [TimeEqualFilter(column, name),
-                FilterNotEqual(column, name, data_type='timepicker', **kwargs),
-                FilterGreater(column, name, data_type='timepicker', **kwargs),
-                FilterSmaller(column, name, data_type='timepicker', **kwargs)]
+                TimeNotEqualFilter(column, name),
+                TimeInRangeFilter(column, name, data_type='timerangepicker'),
+                TimeNotInRangeFilter(column, name, data_type='timerangepicker')]
 
     @filters.convert('enum')
     def conv_enum(self, column, name, options=None, **kwargs):
