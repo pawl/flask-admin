@@ -111,13 +111,13 @@
                   // Bootstrap 2 option
                   // Bootstrap 3 option
                   timePicker: false,
-				  showDropdowns: true,
-				  singleDatePicker: true,
-				  format: $el.attr('data-date-format')
+                  showDropdowns: true,
+                  singleDatePicker: true,
+                  format: $el.attr('data-date-format')
                 },
-				function(start, end) {
-					$('.filter-val').trigger("change");
-				});
+                function(start, end) {
+                    $('.filter-val').trigger("change");
+                });
                 return true;
             case 'daterangepicker':
                 $el.daterangepicker({
@@ -125,83 +125,83 @@
                   // Bootstrap 2 option
                   // Bootstrap 3 option
                   timePicker: false,
-				  showDropdowns: true,
+                  showDropdowns: true,
                   separator: ' to ',
-				  format: $el.attr('data-date-format')
+                  format: $el.attr('data-date-format')
                 },
-				function(start, end) {
-					$('.filter-val').trigger("change");
-				});
+                function(start, end) {
+                    $('.filter-val').trigger("change");
+                });
                 return true;
             case 'datetimepicker':
                 $el.daterangepicker({
-				  timePicker: true,
-				  showDropdowns: true,
-				  singleDatePicker: true,
-				  timePickerIncrement: 1,
-				  timePicker12Hour: false,
-				  format: $el.attr('data-date-format')
-				},
-				function(start, end) {
-					$('.filter-val').trigger("change");
-				});
+                  timePicker: true,
+                  showDropdowns: true,
+                  singleDatePicker: true,
+                  timePickerIncrement: 1,
+                  timePicker12Hour: false,
+                  format: $el.attr('data-date-format')
+                },
+                function(start, end) {
+                    $('.filter-val').trigger("change");
+                });
                 return true;
             case 'datetimerangepicker':
                 $el.daterangepicker({
-				  timePicker: true,
-				  showDropdowns: true,
-				  timePickerIncrement: 1,
-				  timePicker12Hour: false,
+                  timePicker: true,
+                  showDropdowns: true,
+                  timePickerIncrement: 1,
+                  timePicker12Hour: false,
                   separator: ' to ',
-				  format: $el.attr('data-date-format')
-				},
-				function(start, end) {
-					$('.filter-val').trigger("change");
-				});
+                  format: $el.attr('data-date-format')
+                },
+                function(start, end) {
+                    $('.filter-val').trigger("change");
+                });
                 return true;
             case 'timepicker':
                 $el.daterangepicker({
                   // Bootstrap 2 option
-				  timePicker: true,
-				  showDropdowns: true,
-				  format: $el.attr('data-date-format'),
-				  timePicker12Hour: false,
-				  timePickerIncrement: 1,
-				  singleDatePicker: true
+                  timePicker: true,
+                  showDropdowns: true,
+                  format: $el.attr('data-date-format'),
+                  timePicker12Hour: false,
+                  timePickerIncrement: 1,
+                  singleDatePicker: true
                 },
-				function(start, end) {
-					$('.filter-val').trigger("change");
-				});
+                function(start, end) {
+                    $('.filter-val').trigger("change");
+                });
                 // hack to hide calendar to create a time-only picker
-				$el.data('daterangepicker').container.find('.calendar-date').hide();
-				$el.on('showCalendar.daterangepicker', function (event, data) {
-					var $container = data.container;
-					$container.find('.calendar-date').remove();
-				});
+                $el.data('daterangepicker').container.find('.calendar-date').hide();
+                $el.on('showCalendar.daterangepicker', function (event, data) {
+                    var $container = data.container;
+                    $container.find('.calendar-date').remove();
+                });
                 return true;
             case 'timerangepicker':
                 $el.daterangepicker({
                   // Bootstrap 2 option
-				  timePicker: true,
-				  showDropdowns: true,
-				  format: $el.attr('data-date-format'),
-				  timePicker12Hour: false,
+                  timePicker: true,
+                  showDropdowns: true,
+                  format: $el.attr('data-date-format'),
+                  timePicker12Hour: false,
                   separator: ' to ',
-				  timePickerIncrement: 1
+                  timePickerIncrement: 1
                 },
-				function(start, end) {
-					$('.filter-val').trigger("change");
-				});
+                function(start, end) {
+                    $('.filter-val').trigger("change");
+                });
                 // hack - hide calendar + range inputs
-				$el.data('daterangepicker').container.find('.calendar-date').hide();
+                $el.data('daterangepicker').container.find('.calendar-date').hide();
                 $el.data('daterangepicker').container.find('.daterangepicker_start_input').hide();
                 $el.data('daterangepicker').container.find('.daterangepicker_end_input').hide();
                 // hack - add TO between time inputs
                 $el.data('daterangepicker').container.find('.left').before($('<div style="float: right; margin-top: 20px; padding-left: 5px; padding-right: 5px;"> to </span>'));
-				$el.on('showCalendar.daterangepicker', function (event, data) {
-					var $container = data.container;
-					$container.find('.calendar-date').remove();
-				});
+                $el.on('showCalendar.daterangepicker', function (event, data) {
+                    var $container = data.container;
+                    $container.find('.calendar-date').remove();
+                });
                 return true;
         }
       };
