@@ -5,7 +5,7 @@ import datetime
 from flask.ext.admin.babel import lazy_gettext
 from flask.ext.admin.model import filters
 from flask.ext.admin.contrib.sqla import tools
-
+from sqlalchemy.sql import not_
 
 class BaseSQLAFilter(filters.BaseFilter):
     """
@@ -90,87 +90,150 @@ class BooleanNotEqualFilter(FilterNotEqual, filters.BaseBooleanFilter):
     
     
 class DateEqualFilter(FilterEqual, filters.BaseDateFilter):
-    def clean(self, value):
-        return datetime.datetime.strptime(value, '%Y-%m-%d').date()
-
-        
-class DateNotEqualFilter(FilterNotEqual, DateEqualFilter):
     pass
 
+    
+class DateNotEqualFilter(FilterNotEqual, filters.BaseDateFilter):
+    pass
         
-class DateInRangeFilter(BaseSQLAFilter):
+
+class DateGreaterFilter(FilterGreater, filters.BaseDateFilter):
+    pass
+        
+
+class DateSmallerFilter(FilterSmaller, filters.BaseDateFilter):
+    pass
+        
+
+class DateBetweenFilter(BaseSQLAFilter):
+    # do not use clean() for splitting range into values, it will display the [] in the input
     def apply(self, query, value):
         value = [datetime.datetime.strptime(range, '%Y-%m-%d') for range in value.split(' to ')]
         return query.filter(self.column.between(value[0], value[1]))
 
     def operation(self):
-        return lazy_gettext('in range')
+        return lazy_gettext('between')
 
+    def validate(self, value):
+        try:
+            value = [datetime.datetime.strptime(range, '%Y-%m-%d') for range in value.split(' to ')]
+            # if " to " is missing, fail validation
+            if len(value) == 2:
+                return True
+            else:
+                return False        
+        except ValueError:
+            return False        
+        
 
-class DateNotInRangeFilter(BaseSQLAFilter):
+class DateNotBetweenFilter(DateBetweenFilter):
     def apply(self, query, value):
-        # TODO: find alternate "not between" query, ~between isn't possible until sqlalchemy 1.0.0
-        return query.filter(~self.column.between(value[0], value[1]))
-
+        value = [datetime.datetime.strptime(range, '%Y-%m-%d') for range in value.split(' to ')]
+        # ~between() isn't possible until sqlalchemy 1.0.0
+        return query.filter(not_(self.column.between(value[0], value[1])))
+        
     def operation(self):
-        return lazy_gettext('not in range')
+        return lazy_gettext('not between')
         
             
 class DateTimeEqualFilter(FilterEqual, filters.BaseDateTimeFilter):
-    def clean(self, value):
-        return datetime.datetime.strptime(value, '%Y-%m-%d %H:%M:%S')
-
-        
-class DateTimeNotEqualFilter(FilterNotEqual, DateTimeEqualFilter):
     pass
+        
 
-class DateTimeInRangeFilter(BaseSQLAFilter):
+class DateTimeNotEqualFilter(FilterNotEqual, filters.BaseDateTimeFilter):
+    pass
+        
+
+class DateTimeGreaterFilter(FilterGreater, filters.BaseDateTimeFilter):
+    pass
+        
+
+class DateTimeSmallerFilter(FilterSmaller, filters.BaseDateTimeFilter):
+    pass
+        
+
+class DateTimeBetweenFilter(BaseSQLAFilter):
     def apply(self, query, value):
         value = [datetime.datetime.strptime(range, '%Y-%m-%d %H:%M:%S') for range in value.split(' to ')]
         return query.filter(self.column.between(value[0], value[1]))
-
+    
     def operation(self):
-        return lazy_gettext('in range')
-
+        return lazy_gettext('between')
         
-class DateTimeNotInRangeFilter(BaseSQLAFilter):            
+    def validate(self, value):
+        try:
+            value = [datetime.datetime.strptime(range, '%Y-%m-%d %H:%M:%S') for range in value.split(' to ')]
+            if len(value) == 2:
+                return True
+            else:
+                return False
+        except ValueError:
+            return False
+        
+
+class DateTimeNotBetweenFilter(DateTimeBetweenFilter):            
     def apply(self, query, value):
-        return query.filter(~self.column.between(value[0], value[1]))
+        value = [datetime.datetime.strptime(range, '%Y-%m-%d %H:%M:%S') for range in value.split(' to ')]
+        return query.filter(not_(self.column.between(value[0], value[1])))
 
     def operation(self):
-        return lazy_gettext('not in range')
+        return lazy_gettext('not between')
         
-        
+
 class TimeEqualFilter(FilterEqual, filters.BaseTimeFilter):
-    def clean(self, value):
-        timetuple = time.strptime(value, '%H:%M:%S')
-        return datetime.time(timetuple.tm_hour,
-                             timetuple.tm_min,
-                             timetuple.tm_sec)
-
-class TimeNotEqualFilter(FilterNotEqual, TimeEqualFilter):
     pass
+                             
 
-class TimeInRangeFilter(BaseSQLAFilter):
+class TimeNotEqualFilter(FilterNotEqual, filters.BaseTimeFilter):
+    pass
+                             
+
+class TimeGreaterFilter(FilterGreater, filters.BaseTimeFilter):
+    pass
+                             
+
+class TimeSmallerFilter(FilterSmaller, filters.BaseTimeFilter):
+    pass
+                             
+
+class TimeBetweenFilter(BaseSQLAFilter):
     def apply(self, query, value):
         timetuples = [time.strptime(range, '%H:%M:%S') 
                       for range in value.split(' to ')]
         value = [datetime.time(timetuple.tm_hour,
-                             timetuple.tm_min,
-                             timetuple.tm_sec)
-                             for timetuple in timetuples]
+                               timetuple.tm_min,
+                               timetuple.tm_sec)
+                               for timetuple in timetuples]
         return query.filter(self.column.between(value[0], value[1]))
 
     def operation(self):
-        return lazy_gettext('in range')
+        return lazy_gettext('between')
+
+    def validate(self, value):
+        try:
+            timetuples = [time.strptime(range, '%H:%M:%S') 
+                          for range in value.split(' to ')]
+            if len(timetuples) == 2:
+                return True
+            else:
+                return False
+        except ValueError:
+            raise
+            return False
         
 
-class TimeNotInRangeFilter(BaseSQLAFilter):            
+class TimeNotBetweenFilter(TimeBetweenFilter):
     def apply(self, query, value):
-        return query.filter(~self.column.between(value[0], value[1]))
+        timetuples = [time.strptime(range, '%H:%M:%S') 
+                      for range in value.split(' to ')]
+        value = [datetime.time(timetuple.tm_hour,
+                               timetuple.tm_min,
+                               timetuple.tm_sec)
+                               for timetuple in timetuples]
+        return query.filter(not_(self.column.between(value[0], value[1])))
 
     def operation(self):
-        return lazy_gettext('not in range')
+        return lazy_gettext('not between')
         
             
 # Base SQLA filter field converter
@@ -201,23 +264,28 @@ class FilterConverter(filters.BaseFilterConverter):
     def conv_date(self, column, name, **kwargs):
         return [DateEqualFilter(column, name),
                 DateNotEqualFilter(column, name),
-                DateInRangeFilter(column, name, data_type='daterangepicker'),
-                DateNotInRangeFilter(column, name, data_type='daterangepicker')]
-                # TODO: add > and < back
+                DateGreaterFilter(column, name),
+                DateSmallerFilter(column, name),
+                DateBetweenFilter(column, name, data_type='daterangepicker'),
+                DateNotBetweenFilter(column, name, data_type='daterangepicker')]
 
     @filters.convert('datetime')
     def conv_datetime(self, column, name, **kwargs):
         return [DateTimeEqualFilter(column, name),
                 DateTimeNotEqualFilter(column, name),
-                DateTimeInRangeFilter(column, name, data_type='datetimerangepicker'),
-                DateTimeNotInRangeFilter(column, name, data_type='datetimerangepicker')]
+                DateTimeGreaterFilter(column, name),
+                DateTimeSmallerFilter(column, name),
+                DateTimeBetweenFilter(column, name, data_type='datetimerangepicker'),
+                DateTimeNotBetweenFilter(column, name, data_type='datetimerangepicker')]
                 
     @filters.convert('time')
     def conv_time(self, column, name, **kwargs):
         return [TimeEqualFilter(column, name),
                 TimeNotEqualFilter(column, name),
-                TimeInRangeFilter(column, name, data_type='timerangepicker'),
-                TimeNotInRangeFilter(column, name, data_type='timerangepicker')]
+                TimeGreaterFilter(column, name),
+                TimeSmallerFilter(column, name),
+                TimeBetweenFilter(column, name, data_type='timerangepicker'),
+                TimeNotBetweenFilter(column, name, data_type='timerangepicker')]
 
     @filters.convert('enum')
     def conv_enum(self, column, name, options=None, **kwargs):
