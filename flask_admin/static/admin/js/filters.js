@@ -1,4 +1,4 @@
-var AdminFilters = function(element, filtersElement, filterGroups) {
+var AdminFilters = function(element, filtersElement, filterGroups, activeFilters) {
     var $root = $(element);
     var $container = $('.filters', $root);
     var lastCount = 0;
@@ -109,6 +109,8 @@ var AdminFilters = function(element, filtersElement, filterGroups) {
         }
         
         styleFilterInput(filter, $field);
+        
+        return $field;
     }
 
     $('a.filter', filtersElement).click(function() {
@@ -119,6 +121,19 @@ var AdminFilters = function(element, filtersElement, filterGroups) {
         $('button', $root).show();
 
         //return false;
+    });
+    
+    if(activeFilters.length > 0){
+        $('button', $root).show();
+    }
+    
+    // add active filters on page load
+    $.each(activeFilters, function( activeIndex, activeFilter ) {
+        var idx = activeFilter[0],
+            name = activeFilter[1];
+            filterValue = activeFilter[2];
+        $field = addFilter(name, filterGroups[name]);
+        $field.val(filterValue);
     });
 
     $('.filter-op', $root).change(changeOperation);
