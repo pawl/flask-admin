@@ -235,7 +235,7 @@
             prefix = id + '-' + idx;
         }
 
-        // Get tempalate
+        // Get template
         var $template = $($el.find('> .inline-field-template').text());
 
         // Set form ID
