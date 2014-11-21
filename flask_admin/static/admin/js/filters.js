@@ -74,7 +74,9 @@ var AdminFilters = function(element, filtersElement, filterGroups, activeFilters
         );
 
         // on change, get the subfilter based on the index of the added element, then modify the input field (turn into date range if necessary)
-        $select.select2({width: 'resolve'}).on("change", function(e) { styleFilterInput(subfilters[e.added.element[0].index], $el.find('input').last()); });
+        $select.select2({width: 'resolve'}).on("change", function(e) { 
+			styleFilterInput(subfilters[e.added.element[0].index], $el.find('input').last()); 
+		});
 
         // add styling to input field, accommodates filters that change the type of the field 
         function styleFilterInput(filter, field) {
