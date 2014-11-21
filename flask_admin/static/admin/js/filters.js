@@ -40,7 +40,7 @@ var AdminFilters = function(element, filtersElement, filterGroups, activeFilters
         return false;
     }
 
-    function addFilter(name, subfilters) {
+    function addFilter(name, subfilters, selected) {
         var $el = $('<tr />').appendTo($container);
 
         // Filter list
@@ -58,8 +58,15 @@ var AdminFilters = function(element, filtersElement, filterGroups, activeFilters
         var $select = $('<select class="filter-op" />')
                       .change(changeOperation);
 
-        $(subfilters).each(function() {
-            $select.append($('<option/>').attr('value', this.arg).text(this.operation));
+        // if one of the subfilters are selected, use that subfilter to create the input field
+        var filter_selection = 0;
+        $.each(subfilters, function( subfilterIndex, subfilter ) {
+            if (this.arg == selected) {
+                $select.append($('<option/>').attr('value', subfilter.arg).attr('selected', true).text(subfilter.operation));
+                filter_selection = subfilterIndex;
+            } else {
+                $select.append($('<option/>').attr('value', subfilter.arg).text(subfilter.operation));
+            }
         });
 
         $el.append(
@@ -87,7 +94,7 @@ var AdminFilters = function(element, filtersElement, filterGroups, activeFilters
         }
         
         // initial filter creation
-        filter = subfilters[0];
+        filter = subfilters[filter_selection];
         var $field;
 
         if (filter.options) {
@@ -116,7 +123,7 @@ var AdminFilters = function(element, filtersElement, filterGroups, activeFilters
     $('a.filter', filtersElement).click(function() {
         var name = ($(this).text().trim !== undefined ? $(this).text().trim() : $(this).text().replace(/^\s+|\s+$/g,''));
 
-        addFilter(name, filterGroups[name]);
+        addFilter(name, filterGroups[name], false);
 
         $('button', $root).show();
 
@@ -130,9 +137,9 @@ var AdminFilters = function(element, filtersElement, filterGroups, activeFilters
     // add active filters on page load
     $.each(activeFilters, function( activeIndex, activeFilter ) {
         var idx = activeFilter[0],
-            name = activeFilter[1];
+            name = activeFilter[1],
             filterValue = activeFilter[2];
-        $field = addFilter(name, filterGroups[name]);
+        $field = addFilter(name, filterGroups[name], idx);
         $field.val(filterValue);
     });
 
