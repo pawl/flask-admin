@@ -61,7 +61,7 @@ class BaseFilter(object):
 
     def clean(self, value):
         """
-            Parse value into python format.
+            Parse value into python format. Occurs before .apply()
 
             :param value:
                 Value to parse
