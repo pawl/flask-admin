@@ -106,9 +106,12 @@ class DateSmallerFilter(FilterSmaller, filters.BaseDateFilter):
         
 
 class DateBetweenFilter(BaseSQLAFilter):
+    def clean(self, value):
+        return [datetime.datetime.strptime(range, '%Y-%m-%d') for range in value.split(' to ')]
+
     def apply(self, query, value):
-        value = [datetime.datetime.strptime(range, '%Y-%m-%d') for range in value.split(' to ')]
-        return query.filter(self.column.between(value[0], value[1]))
+        start, end = value
+        return query.filter(self.column.between(start, end))
 
     def operation(self):
         return lazy_gettext('between')
@@ -117,7 +120,8 @@ class DateBetweenFilter(BaseSQLAFilter):
         try:
             value = [datetime.datetime.strptime(range, '%Y-%m-%d') for range in value.split(' to ')]
             # if " to " is missing, fail validation
-            if len(value) == 2:
+			# sqlalchemy's .between() will not work if end date is before start date
+            if (len(value) == 2) and (value[0] <= value[1]):
                 return True
             else:
                 return False        
@@ -127,9 +131,9 @@ class DateBetweenFilter(BaseSQLAFilter):
 
 class DateNotBetweenFilter(DateBetweenFilter):
     def apply(self, query, value):
-        value = [datetime.datetime.strptime(range, '%Y-%m-%d') for range in value.split(' to ')]
+        start, end = value
         # ~between() isn't possible until sqlalchemy 1.0.0
-        return query.filter(not_(self.column.between(value[0], value[1])))
+        return query.filter(not_(self.column.between(start, end)))
         
     def operation(self):
         return lazy_gettext('not between')
@@ -152,9 +156,12 @@ class DateTimeSmallerFilter(FilterSmaller, filters.BaseDateTimeFilter):
         
 
 class DateTimeBetweenFilter(BaseSQLAFilter):
+    def clean(self, value):
+        return [datetime.datetime.strptime(range, '%Y-%m-%d %H:%M:%S') for range in value.split(' to ')]
+        
     def apply(self, query, value):
-        value = [datetime.datetime.strptime(range, '%Y-%m-%d %H:%M:%S') for range in value.split(' to ')]
-        return query.filter(self.column.between(value[0], value[1]))
+        start, end = value
+        return query.filter(self.column.between(start, end))
     
     def operation(self):
         return lazy_gettext('between')
@@ -162,7 +169,7 @@ class DateTimeBetweenFilter(BaseSQLAFilter):
     def validate(self, value):
         try:
             value = [datetime.datetime.strptime(range, '%Y-%m-%d %H:%M:%S') for range in value.split(' to ')]
-            if len(value) == 2:
+            if (len(value) == 2) and (value[0] <= value[1]):
                 return True
             else:
                 return False
@@ -170,10 +177,10 @@ class DateTimeBetweenFilter(BaseSQLAFilter):
             return False
         
 
-class DateTimeNotBetweenFilter(DateTimeBetweenFilter):            
+class DateTimeNotBetweenFilter(DateTimeBetweenFilter):
     def apply(self, query, value):
-        value = [datetime.datetime.strptime(range, '%Y-%m-%d %H:%M:%S') for range in value.split(' to ')]
-        return query.filter(not_(self.column.between(value[0], value[1])))
+        start, end = value
+        return query.filter(not_(self.column.between(start, end)))
 
     def operation(self):
         return lazy_gettext('not between')
@@ -196,14 +203,17 @@ class TimeSmallerFilter(FilterSmaller, filters.BaseTimeFilter):
                              
 
 class TimeBetweenFilter(BaseSQLAFilter):
-    def apply(self, query, value):
+    def clean(self, value):
         timetuples = [time.strptime(range, '%H:%M:%S') 
                       for range in value.split(' to ')]
-        value = [datetime.time(timetuple.tm_hour,
-                               timetuple.tm_min,
-                               timetuple.tm_sec)
-                               for timetuple in timetuples]
-        return query.filter(self.column.between(value[0], value[1]))
+        return [datetime.time(timetuple.tm_hour,
+                              timetuple.tm_min,
+                              timetuple.tm_sec)
+                              for timetuple in timetuples]
+
+    def apply(self, query, value):
+        start, end = value
+        return query.filter(self.column.between(start, end))
 
     def operation(self):
         return lazy_gettext('between')
@@ -212,7 +222,7 @@ class TimeBetweenFilter(BaseSQLAFilter):
         try:
             timetuples = [time.strptime(range, '%H:%M:%S') 
                           for range in value.split(' to ')]
-            if len(timetuples) == 2:
+            if (len(timetuples) == 2) and (timetuples[0] <= timetuples[1]):
                 return True
             else:
                 return False
@@ -223,14 +233,9 @@ class TimeBetweenFilter(BaseSQLAFilter):
 
 class TimeNotBetweenFilter(TimeBetweenFilter):
     def apply(self, query, value):
-        timetuples = [time.strptime(range, '%H:%M:%S') 
-                      for range in value.split(' to ')]
-        value = [datetime.time(timetuple.tm_hour,
-                               timetuple.tm_min,
-                               timetuple.tm_sec)
-                               for timetuple in timetuples]
-        return query.filter(not_(self.column.between(value[0], value[1])))
-
+        start, end = value
+        return query.filter(not_(self.column.between(start, end)))
+        
     def operation(self):
         return lazy_gettext('not between')
         
