@@ -40,7 +40,7 @@ var AdminFilters = function(element, filtersElement, filterGroups, activeFilters
         return false;
     }
 
-    function addFilter(name, subfilters, selected) {
+    function addFilter(name, subfilters, selected, filterValue) {
         var $el = $('<tr />').appendTo($container);
 
         // Filter list
@@ -102,8 +102,14 @@ var AdminFilters = function(element, filtersElement, filterGroups, activeFilters
                         .attr('name', makeName(filter.arg));
 
             $(filter.options).each(function() {
-                $field.append($('<option/>')
-                    .val(this[0]).text(this[1]));
+                // for active fields, add "selected" to matching value
+                if (filterValue && (filterValue == this[0])) {
+                    $field.append($('<option/>')
+                        .val(this[0]).text(this[1]).attr('selected', true));
+                } else {
+                    $field.append($('<option/>')
+                        .val(this[0]).text(this[1]));
+                }
             });
 
             $el.append($('<td/>').append($field));
@@ -123,7 +129,7 @@ var AdminFilters = function(element, filtersElement, filterGroups, activeFilters
     $('a.filter', filtersElement).click(function() {
         var name = ($(this).text().trim !== undefined ? $(this).text().trim() : $(this).text().replace(/^\s+|\s+$/g,''));
 
-        addFilter(name, filterGroups[name], false);
+        addFilter(name, filterGroups[name], false, false);
 
         $('button', $root).show();
 
@@ -139,7 +145,10 @@ var AdminFilters = function(element, filtersElement, filterGroups, activeFilters
         var idx = activeFilter[0],
             name = activeFilter[1],
             filterValue = activeFilter[2];
-        $field = addFilter(name, filterGroups[name], idx);
+        $field = addFilter(name, filterGroups[name], idx, filterValue);
+        console.log($field);
+        
+        // set value of newly created field
         $field.val(filterValue);
     });
 
@@ -149,7 +158,7 @@ var AdminFilters = function(element, filtersElement, filterGroups, activeFilters
     });
     $('.remove-filter', $root).click(removeFilter);
 
-    $('.filter-val', $root).each(function() {
+    $('.filter-val', $root).not('.select2-container').each(function() {
         var count = getCount($(this).attr('name'));
         if (count > lastCount)
             lastCount = count;
