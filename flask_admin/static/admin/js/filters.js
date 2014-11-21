@@ -146,7 +146,6 @@ var AdminFilters = function(element, filtersElement, filterGroups, activeFilters
             name = activeFilter[1],
             filterValue = activeFilter[2];
         $field = addFilter(name, filterGroups[name], idx, filterValue);
-        console.log($field);
         
         // set value of newly created field
         $field.val(filterValue);
