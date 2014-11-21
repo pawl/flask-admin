@@ -120,7 +120,7 @@ class DateBetweenFilter(BaseSQLAFilter):
         try:
             value = [datetime.datetime.strptime(range, '%Y-%m-%d') for range in value.split(' to ')]
             # if " to " is missing, fail validation
-			# sqlalchemy's .between() will not work if end date is before start date
+            # sqlalchemy's .between() will not work if end date is before start date
             if (len(value) == 2) and (value[0] <= value[1]):
                 return True
             else:
