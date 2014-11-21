@@ -106,7 +106,6 @@ class DateSmallerFilter(FilterSmaller, filters.BaseDateFilter):
         
 
 class DateBetweenFilter(BaseSQLAFilter):
-    # do not use clean() for splitting range into values, it will display the [] in the input
     def apply(self, query, value):
         value = [datetime.datetime.strptime(range, '%Y-%m-%d') for range in value.split(' to ')]
         return query.filter(self.column.between(value[0], value[1]))
