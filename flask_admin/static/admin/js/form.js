@@ -107,9 +107,6 @@
                 return true;
             case 'datepicker':
                 $el.daterangepicker({
-                  // TODO: Have separate converters for bs2 and bs3
-                  // Bootstrap 2 option
-                  // Bootstrap 3 option
                   timePicker: false,
                   showDropdowns: true,
                   singleDatePicker: true,
@@ -121,9 +118,6 @@
                 return true;
             case 'daterangepicker':
                 $el.daterangepicker({
-                  // TODO: Have separate converters for bs2 and bs3
-                  // Bootstrap 2 option
-                  // Bootstrap 3 option
                   timePicker: false,
                   showDropdowns: true,
                   separator: ' to ',
