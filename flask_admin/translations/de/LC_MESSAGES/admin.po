@@ -158,19 +158,19 @@ msgstr "kleiner als"
 #: ../flask_admin/contrib/peewee/view.py:317
 #: ../flask_admin/contrib/sqla/view.py:627
 #, python-format
-msgid "Failed to create model. %(error)s"
+msgid "Failed to create record. %(error)s"
 msgstr "Erstellen von Model fehlgeschlagen: %(error)s"
 
 #: ../flask_admin/contrib/peewee/view.py:332
 #: ../flask_admin/contrib/sqla/view.py:647
 #, python-format
-msgid "Failed to update model. %(error)s"
+msgid "Failed to update record. %(error)s"
 msgstr "Aktualisieren von Model fehlgeschlagen: %(error)s"
 
 #: ../flask_admin/contrib/peewee/view.py:342
 #: ../flask_admin/contrib/sqla/view.py:666
 #, python-format
-msgid "Failed to delete model. %(error)s"
+msgid "Failed to delete record. %(error)s"
 msgstr "Löschen von Model fehlgeschlagen: %(error)s"
 
 #: ../flask_admin/contrib/peewee/view.py:356
@@ -189,7 +189,7 @@ msgstr[1] "%(count)s Models wurden erfolgreich gelöscht."
 #: ../flask_admin/contrib/peewee/view.py:377
 #: ../flask_admin/contrib/sqla/view.py:704
 #, fuzzy, python-format
-msgid "Failed to delete models. %(error)s"
+msgid "Failed to delete records. %(error)s"
 msgstr "Löschen von Model fehlgeschlagen: %(error)s"
 
 #: ../flask_admin/contrib/sqla/fields.py:125

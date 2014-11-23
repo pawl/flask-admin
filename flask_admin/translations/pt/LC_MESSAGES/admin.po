@@ -225,7 +225,7 @@ msgstr "Falha ao obter model. %(error)s"
 #: ../flask_admin/contrib/pymongo/view.py:264
 #: ../flask_admin/contrib/sqla/view.py:806
 #, python-format
-msgid "Failed to create model. %(error)s"
+msgid "Failed to create record. %(error)s"
 msgstr "Falha ao criar model. %(error)s"
 
 #: ../flask_admin/contrib/mongoengine/view.py:526
@@ -233,7 +233,7 @@ msgstr "Falha ao criar model. %(error)s"
 #: ../flask_admin/contrib/pymongo/view.py:289
 #: ../flask_admin/contrib/sqla/view.py:832
 #, python-format
-msgid "Failed to update model. %(error)s"
+msgid "Failed to update record. %(error)s"
 msgstr "Falha ao atualizar model. %(error)s"
 
 #: ../flask_admin/contrib/mongoengine/view.py:551
@@ -241,7 +241,7 @@ msgstr "Falha ao atualizar model. %(error)s"
 #: ../flask_admin/contrib/pymongo/view.py:315
 #: ../flask_admin/contrib/sqla/view.py:859
 #, python-format
-msgid "Failed to delete model. %(error)s"
+msgid "Failed to delete record. %(error)s"
 msgstr "Falha ao excluir model. %(error)s"
 
 #: ../flask_admin/contrib/mongoengine/view.py:588
@@ -266,7 +266,7 @@ msgstr[1] "%(count)s models foram excluídos com sucesso."
 #: ../flask_admin/contrib/pymongo/view.py:345
 #: ../flask_admin/contrib/sqla/view.py:898
 #, python-format
-msgid "Failed to delete models. %(error)s"
+msgid "Failed to delete records. %(error)s"
 msgstr "Falha ao excluir models. %(error)s"
 
 #: ../flask_admin/contrib/sqla/fields.py:123

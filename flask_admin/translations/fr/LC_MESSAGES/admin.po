@@ -159,19 +159,19 @@ msgstr "plus petit que"
 #: ../flask_admin/contrib/peewee/view.py:317
 #: ../flask_admin/contrib/sqla/view.py:627
 #, python-format
-msgid "Failed to create model. %(error)s"
+msgid "Failed to create record. %(error)s"
 msgstr "Échec dans la création de l'objet. %(error)s"
 
 #: ../flask_admin/contrib/peewee/view.py:332
 #: ../flask_admin/contrib/sqla/view.py:647
 #, python-format
-msgid "Failed to update model. %(error)s"
+msgid "Failed to update record. %(error)s"
 msgstr "Échec dans la dépose de l'objet. %(error)s"
 
 #: ../flask_admin/contrib/peewee/view.py:342
 #: ../flask_admin/contrib/sqla/view.py:666
 #, python-format
-msgid "Failed to delete model. %(error)s"
+msgid "Failed to delete record. %(error)s"
 msgstr "Échec dans la suppression de l'objet: %(error)s"
 
 #: ../flask_admin/contrib/peewee/view.py:356
@@ -190,7 +190,7 @@ msgstr[1] "Les %(count)s objets ont bien été détruits."
 #: ../flask_admin/contrib/peewee/view.py:377
 #: ../flask_admin/contrib/sqla/view.py:704
 #, python-format
-msgid "Failed to delete models. %(error)s"
+msgid "Failed to delete records. %(error)s"
 msgstr "Échec dans la suppression des objets: %(error)s"
 
 #: ../flask_admin/contrib/sqla/fields.py:125

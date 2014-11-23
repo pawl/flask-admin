@@ -158,19 +158,19 @@ msgstr "小於"
 #: ../flask_admin/contrib/peewee/view.py:317
 #: ../flask_admin/contrib/sqla/view.py:627
 #, python-format
-msgid "Failed to create model. %(error)s"
+msgid "Failed to create record. %(error)s"
 msgstr "建立模型的時候發生異常：%(error)s"
 
 #: ../flask_admin/contrib/peewee/view.py:332
 #: ../flask_admin/contrib/sqla/view.py:647
 #, python-format
-msgid "Failed to update model. %(error)s"
+msgid "Failed to update record. %(error)s"
 msgstr "更新模型的時候發生異常：%(error)s"
 
 #: ../flask_admin/contrib/peewee/view.py:342
 #: ../flask_admin/contrib/sqla/view.py:666
 #, python-format
-msgid "Failed to delete model. %(error)s"
+msgid "Failed to delete record. %(error)s"
 msgstr "刪除模型的時候發生異常：%(error)s"
 
 #: ../flask_admin/contrib/peewee/view.py:356
@@ -188,7 +188,7 @@ msgstr[0] "刪除作業成功完成。"
 #: ../flask_admin/contrib/peewee/view.py:377
 #: ../flask_admin/contrib/sqla/view.py:704
 #, python-format
-msgid "Failed to delete models. %(error)s"
+msgid "Failed to delete records. %(error)s"
 msgstr "刪除模型的時候發生異常：%(error)s"
 
 #: ../flask_admin/contrib/sqla/fields.py:125

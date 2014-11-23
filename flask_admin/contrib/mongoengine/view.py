@@ -508,10 +508,10 @@ class ModelView(BaseModelView):
             model.save()
         except Exception as ex:
             if not self.handle_view_exception(ex):
-                flash(gettext('Failed to create model. %(error)s',
+                flash(gettext('Failed to create record. %(error)s',
                               error=format_error(ex)),
                       'error')
-                log.exception('Failed to create model')
+                log.exception('Failed to create record.)
 
             return False
         else:
@@ -534,10 +534,10 @@ class ModelView(BaseModelView):
             model.save()
         except Exception as ex:
             if not self.handle_view_exception(ex):
-                flash(gettext('Failed to update model. %(error)s',
+                flash(gettext('Failed to update record. %(error)s',
                               error=format_error(ex)),
                       'error')
-                log.exception('Failed to update model')
+                log.exception('Failed to update record.)
 
             return False
         else:
@@ -558,10 +558,10 @@ class ModelView(BaseModelView):
             return True
         except Exception as ex:
             if not self.handle_view_exception(ex):
-                flash(gettext('Failed to delete model. %(error)s',
+                flash(gettext('Failed to delete record. %(error)s',
                               error=format_error(ex)),
                       'error')
-                log.exception('Failed to delete model')
+                log.exception('Failed to delete record.)
 
             return False
 
@@ -612,5 +612,5 @@ class ModelView(BaseModelView):
                            count=count))
         except Exception as ex:
             if not self.handle_view_exception(ex):
-                flash(gettext('Failed to delete models. %(error)s', error=str(ex)),
+                flash(gettext('Failed to delete records. %(error)s', error=str(ex)),
                       'error')

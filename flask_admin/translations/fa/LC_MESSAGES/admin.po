@@ -211,7 +211,7 @@ msgstr "کوچکتر از"
 #: ../flask_admin/contrib/pymongo/view.py:268
 #: ../flask_admin/contrib/sqla/view.py:734
 #, python-format
-msgid "Failed to create model. %(error)s"
+msgid "Failed to create record. %(error)s"
 msgstr "ساخت مدل با مشکل روبرو شد %(error)s"
 
 #: ../flask_admin/contrib/mongoengine/view.py:358
@@ -219,7 +219,7 @@ msgstr "ساخت مدل با مشکل روبرو شد %(error)s"
 #: ../flask_admin/contrib/pymongo/view.py:290
 #: ../flask_admin/contrib/sqla/view.py:754
 #, python-format
-msgid "Failed to update model. %(error)s"
+msgid "Failed to update record. %(error)s"
 msgstr "بروزرسانی مدل با مشکل روبرو شد%(error)s"
 
 #: ../flask_admin/contrib/mongoengine/view.py:375
@@ -227,7 +227,7 @@ msgstr "بروزرسانی مدل با مشکل روبرو شد%(error)s"
 #: ../flask_admin/contrib/pymongo/view.py:312
 #: ../flask_admin/contrib/sqla/view.py:773
 #, python-format
-msgid "Failed to delete model. %(error)s"
+msgid "Failed to delete record. %(error)s"
 msgstr "حذف مدل با مشکل روبرو شد %(error)s"
 
 #: ../flask_admin/contrib/mongoengine/view.py:390
@@ -253,7 +253,7 @@ msgstr[2] ""
 #: ../flask_admin/contrib/pymongo/view.py:342
 #: ../flask_admin/contrib/sqla/view.py:811
 #, python-format
-msgid "Failed to delete models. %(error)s"
+msgid "Failed to delete records. %(error)s"
 msgstr "حذف مدل ها با مشکل روبرو شد %(error)s"
 
 #: ../flask_admin/contrib/sqla/fields.py:125

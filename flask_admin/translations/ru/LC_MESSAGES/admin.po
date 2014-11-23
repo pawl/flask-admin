@@ -160,19 +160,19 @@ msgstr "меньше чем"
 #: ../flask_admin/contrib/peewee/view.py:317
 #: ../flask_admin/contrib/sqla/view.py:627
 #, python-format
-msgid "Failed to create model. %(error)s"
+msgid "Failed to create record. %(error)s"
 msgstr "Ошибка создания записи: %(error)s"
 
 #: ../flask_admin/contrib/peewee/view.py:332
 #: ../flask_admin/contrib/sqla/view.py:647
 #, python-format
-msgid "Failed to update model. %(error)s"
+msgid "Failed to update record. %(error)s"
 msgstr "Ошибка обновления записи: %(error)s"
 
 #: ../flask_admin/contrib/peewee/view.py:342
 #: ../flask_admin/contrib/sqla/view.py:666
 #, python-format
-msgid "Failed to delete model. %(error)s"
+msgid "Failed to delete record. %(error)s"
 msgstr "Ошибка удаления записи: %(error)s"
 
 #: ../flask_admin/contrib/peewee/view.py:356
