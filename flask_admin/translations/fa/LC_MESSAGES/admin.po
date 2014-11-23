@@ -242,8 +242,8 @@ msgstr "آیا از خذف مدل ها اطمینان دارید"
 #: ../flask_admin/contrib/pymongo/view.py:337
 #: ../flask_admin/contrib/sqla/view.py:806
 #, python-format
-msgid "Model was successfully deleted."
-msgid_plural "%(count)s models were successfully deleted."
+msgid "Record was successfully deleted."
+msgid_plural "%(count)s records were successfully deleted."
 msgstr[0] "مدل با موفقیت حذف شد"
 msgstr[1] "%(count)s  مدل با موفقیت خذف شدند"
 msgstr[2] ""
@@ -267,7 +267,7 @@ msgid "Already exists."
 msgstr "قبلا وجود داشته است"
 
 #: ../flask_admin/model/base.py:947
-msgid "Model was successfully created."
+msgid "Record was successfully created."
 msgstr "مدل با موفقیت ساخته شد"
 
 #: ../flask_admin/model/filters.py:85

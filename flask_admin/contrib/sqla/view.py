@@ -938,8 +938,8 @@ class ModelView(BaseModelView):
 
             self.session.commit()
 
-            flash(ngettext('Model was successfully deleted.',
-                           '%(count)s models were successfully deleted.',
+            flash(ngettext('Record was successfully deleted.',
+                           '%(count)s records were successfully deleted.',
                            count,
                            count=count))
         except Exception as ex:

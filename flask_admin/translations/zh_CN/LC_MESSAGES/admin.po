@@ -247,8 +247,8 @@ msgstr "你打算要删除这些 model 吗？"
 #: ../flask_admin/contrib/pymongo/view.py:340
 #: ../flask_admin/contrib/sqla/view.py:886
 #, python-format
-msgid "Model was successfully deleted."
-msgid_plural "%(count)s models were successfully deleted."
+msgid "Record was successfully deleted."
+msgid_plural "%(count)s records were successfully deleted."
 msgstr[0] "删除 model 成功。"
 msgstr[1] "%(count)s 个 model 已被删除。"
 
@@ -288,11 +288,11 @@ msgid "There are no items in the table."
 msgstr "表中没有任何记录"
 
 #: ../flask_admin/model/base.py:1199
-msgid "Model was successfully created."
+msgid "Record was successfully created."
 msgstr "创建 model 成功。"
 
 #: ../flask_admin/model/base.py:1234
-msgid "Model was successfully saved."
+msgid "Record was successfully saved."
 msgstr "保存 model 成功"
 
 #: ../flask_admin/model/filters.py:86

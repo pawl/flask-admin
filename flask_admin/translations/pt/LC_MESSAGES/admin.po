@@ -256,9 +256,9 @@ msgstr "Você tem certeza que deseja excluir os models selecionados?"
 #: ../flask_admin/contrib/pymongo/view.py:340
 #: ../flask_admin/contrib/sqla/view.py:890
 #, python-format
-msgid "Model was successfully deleted."
-msgid_plural "%(count)s models were successfully deleted."
-msgstr[0] "Model was successfully deleted."
+msgid "Record was successfully deleted."
+msgid_plural "%(count)s records were successfully deleted."
+msgstr[0] "Record was successfully deleted."
 msgstr[1] "%(count)s models foram excluídos com sucesso."
 
 #: ../flask_admin/contrib/mongoengine/view.py:605
@@ -302,11 +302,11 @@ msgid "There are no items in the table."
 msgstr "Não existem itens na tabela."
 
 #: ../flask_admin/model/base.py:1257
-msgid "Model was successfully created."
+msgid "Record was successfully created."
 msgstr "Model criado com sucesso."
 
 #: ../flask_admin/model/base.py:1294
-msgid "Model was successfully saved."
+msgid "Record was successfully saved."
 msgstr "Model salvo com sucesso."
 
 #: ../flask_admin/model/filters.py:91

@@ -181,8 +181,8 @@ msgstr "¿Está seguro de que desea borrar los elementos seleccionados?"
 #: ../flask_admin/contrib/peewee/view.py:372
 #: ../flask_admin/contrib/sqlamodel/view.py:699
 #, python-format
-msgid "Model was successfully deleted."
-msgid_plural "%(count)s models were successfully deleted."
+msgid "Record was successfully deleted."
+msgid_plural "%(count)s records were successfully deleted."
 msgstr[0] "El elemento se ha borrado correctamente"
 msgstr[1] "Los elementos se han borrado correctamente"
 
@@ -203,7 +203,7 @@ msgid "Already exists."
 msgstr "Ya existe"
 
 #: ../flask_admin/model/base.py:869
-msgid "Model was successfully created."
+msgid "Record was successfully created."
 msgstr "El elemento se ha creado correctamente"
 
 #: ../flask_admin/model/filters.py:82

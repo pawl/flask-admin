@@ -181,8 +181,8 @@ msgstr "Sind Sie sicher, dass sie die ausgewählten Models löschen wollen?"
 #: ../flask_admin/contrib/peewee/view.py:372
 #: ../flask_admin/contrib/sqla/view.py:699
 #, python-format
-msgid "Model was successfully deleted."
-msgid_plural "%(count)s models were successfully deleted."
+msgid "Record was successfully deleted."
+msgid_plural "%(count)s records were successfully deleted."
 msgstr[0] "Model wurde erfolgreich gelöscht."
 msgstr[1] "%(count)s Models wurden erfolgreich gelöscht."
 
@@ -203,7 +203,7 @@ msgid "Already exists."
 msgstr "Existiert bereits."
 
 #: ../flask_admin/model/base.py:869
-msgid "Model was successfully created."
+msgid "Record was successfully created."
 msgstr "Model wurde erfolgreich erstellt."
 
 #: ../flask_admin/model/filters.py:82

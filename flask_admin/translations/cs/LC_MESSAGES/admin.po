@@ -182,8 +182,8 @@ msgstr "Skutečně chcete vymazat vybrané modely?"
 #: ../flask_admin/contrib/peewee/view.py:372
 #: ../flask_admin/contrib/sqla/view.py:699
 #, python-format
-msgid "Model was successfully deleted."
-msgid_plural "%(count)s models were successfully deleted."
+msgid "Record was successfully deleted."
+msgid_plural "%(count)s records were successfully deleted."
 msgstr[0] "%(count)s model byl úspěšně smazán."
 msgstr[1] "%(count)s modely byly úspěšně smazány."
 msgstr[2] "%(count)s modelů bylo úspěšně smazáno."
@@ -205,7 +205,7 @@ msgid "Already exists."
 msgstr "Již existuje."
 
 #: ../flask_admin/model/base.py:869
-msgid "Model was successfully created."
+msgid "Record was successfully created."
 msgstr "Model byl úspěšně vytvořen."
 
 #: ../flask_admin/model/filters.py:82

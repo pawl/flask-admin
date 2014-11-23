@@ -181,7 +181,7 @@ msgstr "您確定要刪除這些模型嗎？"
 #: ../flask_admin/contrib/peewee/view.py:372
 #: ../flask_admin/contrib/sqla/view.py:699
 #, python-format
-msgid "Model was successfully deleted."
+msgid "Record was successfully deleted."
 msgid_plural "%(count)s 個模型已被成功刪除。"
 msgstr[0] "刪除作業成功完成。"
 
@@ -202,7 +202,7 @@ msgid "Already exists."
 msgstr "資料已經存在。"
 
 #: ../flask_admin/model/base.py:869
-msgid "Model was successfully created."
+msgid "Record was successfully created."
 msgstr "模型建立成功。"
 
 #: ../flask_admin/model/filters.py:82

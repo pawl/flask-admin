@@ -182,8 +182,8 @@ msgstr "Êtes-vous bien sûr de vouloir supprimer ces objets?"
 #: ../flask_admin/contrib/peewee/view.py:372
 #: ../flask_admin/contrib/sqla/view.py:699
 #, python-format
-msgid "Model was successfully deleted."
-msgid_plural "%(count)s models were successfully deleted."
+msgid "Record was successfully deleted."
+msgid_plural "%(count)s records were successfully deleted."
 msgstr[0] "L'objet a bien été détruit."
 msgstr[1] "Les %(count)s objets ont bien été détruits."
 
@@ -204,7 +204,7 @@ msgid "Already exists."
 msgstr "Existe déjà."
 
 #: ../flask_admin/model/base.py:869
-msgid "Model was successfully created."
+msgid "Record was successfully created."
 msgstr "L'objet a bien été créé."
 
 #: ../flask_admin/model/filters.py:82

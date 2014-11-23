@@ -179,8 +179,8 @@ msgstr ""
 #: ../flask_admin/contrib/peewee/view.py:372
 #: ../flask_admin/contrib/sqlamodel/view.py:699
 #, python-format
-msgid "Model was successfully deleted."
-msgid_plural "%(count)s models were successfully deleted."
+msgid "Record was successfully deleted."
+msgid_plural "%(count)s records were successfully deleted."
 msgstr[0] ""
 msgstr[1] ""
 
@@ -201,7 +201,7 @@ msgid "Already exists."
 msgstr ""
 
 #: ../flask_admin/model/base.py:869
-msgid "Model was successfully created."
+msgid "Record was successfully created."
 msgstr ""
 
 #: ../flask_admin/model/filters.py:82

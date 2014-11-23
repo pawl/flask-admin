@@ -606,8 +606,8 @@ class ModelView(BaseModelView):
             for obj in self.get_query().in_bulk(all_ids).values():
                 count += self.delete_model(obj)
 
-            flash(ngettext('Model was successfully deleted.',
-                           '%(count)s models were successfully deleted.',
+            flash(ngettext('Record was successfully deleted.',
+                           '%(count)s records were successfully deleted.',
                            count,
                            count=count))
         except Exception as ex:
