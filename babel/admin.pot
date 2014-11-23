@@ -173,7 +173,7 @@ msgstr ""
 
 #: ../flask_admin/contrib/peewee/view.py:356
 #: ../flask_admin/contrib/sqlamodel/view.py:681
-msgid "Are you sure you want to delete selected models?"
+msgid "Are you sure you want to delete selected records?"
 msgstr ""
 
 #: ../flask_admin/contrib/peewee/view.py:372
@@ -298,10 +298,10 @@ msgid "Remove Filter"
 msgstr ""
 
 #: ../flask_admin/templates/admin/model/list.html:149
-msgid "You sure you want to delete this item?"
+msgid "Are you sure you want to delete this record?"
 msgstr ""
 
 #: ../flask_admin/templates/admin/model/list.html:173
-msgid "Please select at least one model."
+msgid "Please select at least one record."
 msgstr ""
 

@@ -177,7 +177,7 @@ msgstr "Ошибка удаления записи: %(error)s"
 
 #: ../flask_admin/contrib/peewee/view.py:356
 #: ../flask_admin/contrib/sqla/view.py:681
-msgid "Are you sure you want to delete selected models?"
+msgid "Are you sure you want to delete selected records?"
 msgstr "Вы уверены что хотите удалить ?"
 
 
@@ -291,10 +291,10 @@ msgid "Remove Filter"
 msgstr "Убрать Фильтр"
 
 #: ../flask_admin/templates/admin/model/list.html:149
-msgid "You sure you want to delete this item?"
+msgid "Are you sure you want to delete this record?"
 msgstr "Вы уверены что хотите удалить эту запись?"
 
 #: ../flask_admin/templates/admin/model/list.html:173
-msgid "Please select at least one model."
+msgid "Please select at least one record."
 msgstr "Выберите по крайней мере одну запись."
 

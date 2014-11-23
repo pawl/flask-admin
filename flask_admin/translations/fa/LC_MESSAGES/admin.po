@@ -234,7 +234,7 @@ msgstr "حذف مدل با مشکل روبرو شد %(error)s"
 #: ../flask_admin/contrib/peewee/view.py:376
 #: ../flask_admin/contrib/pymongo/view.py:327
 #: ../flask_admin/contrib/sqla/view.py:788
-msgid "Are you sure you want to delete selected models?"
+msgid "Are you sure you want to delete selected records?"
 msgstr "آیا از خذف مدل ها اطمینان دارید"
 
 #: ../flask_admin/contrib/mongoengine/view.py:400
@@ -369,10 +369,10 @@ msgid "Search"
 msgstr "جستجو"
 
 #: ../flask_admin/templates/admin/model/list.html:108
-msgid "You sure you want to delete this item?"
+msgid "Are you sure you want to delete this record?"
 msgstr "آیا از حذف این موارد اطمینان دارید؟"
 
 #: ../flask_admin/templates/admin/model/list.html:133
-msgid "Please select at least one model."
+msgid "Please select at least one record."
 msgstr "حداقل یک پوشه انتخاب کنید"
 

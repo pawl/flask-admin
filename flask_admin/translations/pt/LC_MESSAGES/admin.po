@@ -248,7 +248,7 @@ msgstr "Falha ao excluir model. %(error)s"
 #: ../flask_admin/contrib/peewee/view.py:406
 #: ../flask_admin/contrib/pymongo/view.py:330
 #: ../flask_admin/contrib/sqla/view.py:874
-msgid "Are you sure you want to delete selected models?"
+msgid "Are you sure you want to delete selected records?"
 msgstr "Você tem certeza que deseja excluir os models selecionados?"
 
 #: ../flask_admin/contrib/mongoengine/view.py:597
@@ -462,10 +462,10 @@ msgstr "Selecionar registro"
 
 #: ../flask_admin/templates/bootstrap2/admin/model/list.html:115
 #: ../flask_admin/templates/bootstrap3/admin/model/list.html:115
-msgid "You sure you want to delete this item?"
+msgid "Are you sure you want to delete this record?"
 msgstr "Você tem certeza que deseja excluir este item?"
 
 #: ../flask_admin/templates/bootstrap2/admin/model/list.html:152
 #: ../flask_admin/templates/bootstrap3/admin/model/list.html:152
-msgid "Please select at least one model."
+msgid "Please select at least one record."
 msgstr "Por favor, selecione pelo menos um model."

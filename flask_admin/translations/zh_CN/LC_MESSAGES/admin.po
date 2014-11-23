@@ -239,7 +239,7 @@ msgstr "删除 model 失败。%(error)s"
 #: ../flask_admin/contrib/peewee/view.py:406
 #: ../flask_admin/contrib/pymongo/view.py:330
 #: ../flask_admin/contrib/sqla/view.py:869
-msgid "Are you sure you want to delete selected models?"
+msgid "Are you sure you want to delete selected records?"
 msgstr "你打算要删除这些 model 吗？"
 
 #: ../flask_admin/contrib/mongoengine/view.py:581
@@ -399,10 +399,10 @@ msgid "Search"
 msgstr "搜索"
 
 #: ../flask_admin/templates/admin/model/list.html:110
-msgid "You sure you want to delete this item?"
+msgid "Are you sure you want to delete this record?"
 msgstr "你打算删除这条记录？"
 
 #: ../flask_admin/templates/admin/model/list.html:146
-msgid "Please select at least one model."
+msgid "Please select at least one record."
 msgstr "请至少选择一个 model。"
 

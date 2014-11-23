@@ -175,7 +175,7 @@ msgstr "Löschen von Model fehlgeschlagen: %(error)s"
 
 #: ../flask_admin/contrib/peewee/view.py:356
 #: ../flask_admin/contrib/sqla/view.py:681
-msgid "Are you sure you want to delete selected models?"
+msgid "Are you sure you want to delete selected records?"
 msgstr "Sind Sie sicher, dass sie die ausgewählten Models löschen wollen?"
 
 #: ../flask_admin/contrib/peewee/view.py:372
@@ -300,9 +300,9 @@ msgid "Remove Filter"
 msgstr "Filter löschen"
 
 #: ../flask_admin/templates/admin/model/list.html:149
-msgid "You sure you want to delete this item?"
+msgid "Are you sure you want to delete this record?"
 msgstr "Sind Sie sicher, dass Sie diesen Eintrag löschen wollen?"
 
 #: ../flask_admin/templates/admin/model/list.html:173
-msgid "Please select at least one model."
+msgid "Please select at least one record."
 msgstr "Bitte wählen Sie mindestens ein Model aus."
