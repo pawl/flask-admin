@@ -26,7 +26,8 @@ class CustomModelView(ModelView):
 def create_models(db):
     class Model1(db.Model):
         def __init__(self, test1=None, test2=None, test3=None, test4=None, 
-                     bool_field=False, date_field=None, time_field=None, datetime_field=None):
+                     bool_field=False, date_field=None, time_field=None,
+                     datetime_field=None, enum_field=None):
             self.test1 = test1
             self.test2 = test2
             self.test3 = test3
@@ -35,6 +36,7 @@ def create_models(db):
             self.date_field = date_field
             self.time_field = time_field
             self.datetime_field = datetime_field
+            self.enum_field = enum_field
 
         id = db.Column(db.Integer, primary_key=True)
         test1 = db.Column(db.String(20))
@@ -42,7 +44,7 @@ def create_models(db):
         test3 = db.Column(db.Text)
         test4 = db.Column(db.UnicodeText)
         bool_field = db.Column(db.Boolean)
-        enum_field = db.Column(db.Enum('model1_v1', 'model1_v1'), nullable=True)
+        enum_field = db.Column(db.Enum('model1_v1', 'model1_v2'), nullable=True)
         
         date_field = db.Column(db.Date)
         time_field = db.Column(db.Time)
@@ -287,7 +289,7 @@ def test_column_filters():
     )
     admin.add_view(view)
 
-    eq_(len(view._filters), 5)
+    eq_(len(view._filters), 6)
 
     eq_([(f['index'], f['operation']) for f in view._filter_groups[u'Test1']],
         [
@@ -296,6 +298,7 @@ def test_column_filters():
             (2, u'contains'),
             (3, u'not contains'),
             (4, u'empty'),
+            (5, u'in list'),
         ])
 
     # Test filter that references property
@@ -309,45 +312,51 @@ def test_column_filters():
             (2, u'contains'),
             (3, u'not contains'),
             (4, u'empty'),
+            (5, u'in list'),
         ])
 
     eq_([(f['index'], f['operation']) for f in view._filter_groups[u'Model1 / Test2']],
         [
-            (5, u'equals'),
-            (6, u'not equal'),
-            (7, u'contains'),
-            (8, u'not contains'),
-            (9, u'empty'),
+            (6, u'equals'),
+            (7, u'not equal'),
+            (8, u'contains'),
+            (9, u'not contains'),
+            (10, u'empty'),
+            (11, u'in list'),
         ])
 
     eq_([(f['index'], f['operation']) for f in view._filter_groups[u'Model1 / Test3']],
         [
-            (10, u'equals'),
-            (11, u'not equal'),
-            (12, u'contains'),
-            (13, u'not contains'),
-            (14, u'empty'),
+            (12, u'equals'),
+            (13, u'not equal'),
+            (14, u'contains'),
+            (15, u'not contains'),
+            (16, u'empty'),
+            (17, u'in list'),
         ])
 
     eq_([(f['index'], f['operation']) for f in view._filter_groups[u'Model1 / Test4']],
         [
-            (15, u'equals'),
-            (16, u'not equal'),
-            (17, u'contains'),
-            (18, u'not contains'),
-            (19, u'empty'),
+            (18, u'equals'),
+            (19, u'not equal'),
+            (20, u'contains'),
+            (21, u'not contains'),
+            (22, u'empty'),
+            (23, u'in list'),
         ])
 
     eq_([(f['index'], f['operation']) for f in view._filter_groups[u'Model1 / Bool Field']],
         [
-            (20, u'equals'),
-            (21, u'not equal'),
+            (24, u'equals'),
+            (25, u'not equal'),
         ])
 
     eq_([(f['index'], f['operation']) for f in view._filter_groups[u'Model1 / Enum Field']],
         [
-            (22, u'equals'),
-            (23, u'not equal'),
+            (26, u'equals'),
+            (27, u'not equal'),
+            (28, u'empty'),
+            (29, u'in list'),
         ])
 
     # Test filter with a dot
@@ -378,11 +387,15 @@ def test_column_filters():
     datetime_obj1 = Model1('datetime_obj1', datetime_field=datetime(2014,4,3,1,9,0))
     datetime_obj2 = Model1('datetime_obj2', datetime_field=datetime(2013,3,2,0,8,0))
     
+    enum_obj1 = Model1('enum_obj1', enum_field="model1_v1")
+    enum_obj2 = Model1('enum_obj2', enum_field="model1_v2")
+    
     db.session.add_all([
         model1_obj1, model1_obj2, model1_obj3, model1_obj4,
         model2_obj1, model2_obj2, model2_obj3, model2_obj4,
         date_obj1, timeonly_obj1, datetime_obj1,
-        date_obj2, timeonly_obj2, datetime_obj2
+        date_obj2, timeonly_obj2, datetime_obj2,
+        enum_obj1, enum_obj2
     ])
     db.session.commit()
 
@@ -400,7 +413,7 @@ def test_column_filters():
     ok_('model1_obj1' in data)
     ok_('model1_obj2' in data)
 
-    # Test different filter types
+    # Test numeric filter
     view = CustomModelView(Model2, db.session,
                            column_filters=['int_field'])
     admin.add_view(view)
@@ -412,6 +425,7 @@ def test_column_filters():
             (2, 'greater than'),
             (3, 'smaller than'),
             (4, 'empty'),
+            (5, 'in list'),
         ])
 
     # Test filters to joined table field
@@ -662,6 +676,50 @@ def test_column_filters():
     ok_('model1_obj1' not in data)
     ok_('timeonly_obj1' in data)
     ok_('timeonly_obj2' in data)
+    
+    # Test enum filter
+    view = CustomModelView(Model1, db.session,
+                           column_filters=['enum_field'], 
+                           endpoint="_enumfield")
+    admin.add_view(view)
+    
+    # enum - equals
+    rv = client.get('/admin/_enumfield/?flt0_0=model1_v1')
+    eq_(rv.status_code, 200)
+    data = rv.data.decode('utf-8')
+    ok_('enum_obj1' in data)
+    ok_('enum_obj2' not in data)
+    
+    # enum - not equal
+    rv = client.get('/admin/_enumfield/?flt0_1=model1_v1')
+    eq_(rv.status_code, 200)
+    data = rv.data.decode('utf-8')
+    ok_('enum_obj1' not in data)
+    ok_('enum_obj2' in data)
+    
+    # enum - empty
+    rv = client.get('/admin/_enumfield/?flt0_2=1')
+    eq_(rv.status_code, 200)
+    data = rv.data.decode('utf-8')
+    ok_('model1_obj1' in data)
+    ok_('enum_obj1' not in data)
+    ok_('enum_obj2' not in data)
+    
+    # enum - not empty
+    rv = client.get('/admin/_enumfield/?flt0_2=0')
+    eq_(rv.status_code, 200)
+    data = rv.data.decode('utf-8')
+    ok_('model1_obj1' not in data)
+    ok_('enum_obj1' in data)
+    ok_('enum_obj2' in data)
+    
+    # enum - in list
+    rv = client.get('/admin/_enumfield/?flt0_3=model1_v1%2Cmodel1_v2')
+    eq_(rv.status_code, 200)
+    data = rv.data.decode('utf-8')
+    ok_('model1_obj1' not in data)
+    ok_('enum_obj1' in data)
+    ok_('enum_obj2' in data)
     
 def test_url_args():
     app, db, admin = setup()
@@ -994,27 +1052,31 @@ def test_extra_field_order():
 
 def test_modelview_localization():
     def test_locale(locale):
-        app, db, admin = setup()
-        
-        app.config['BABEL_DEFAULT_LOCALE'] = locale
-        babel = Babel(app)
-        
-        Model1, _ = create_models(db)
-        
-        view = CustomModelView(
-            Model1, db.session,
-            column_filters=['test1', 'bool_field', 'date_field', 'datetime_field', 'time_field']
-        )
-        
-        admin.add_view(view)
-        
-        client = app.test_client()
-        
-        rv = client.get('/admin/model1/')
-        eq_(rv.status_code, 200)
-        
-        rv = client.get('/admin/model1/new/')
-        eq_(rv.status_code, 200)
+        try:
+            app, db, admin = setup()
+            
+            app.config['BABEL_DEFAULT_LOCALE'] = locale
+            babel = Babel(app)
+            
+            Model1, _ = create_models(db)
+            
+            view = CustomModelView(
+                Model1, db.session,
+                column_filters=['test1', 'bool_field', 'date_field', 'datetime_field', 'time_field']
+            )
+            
+            admin.add_view(view)
+            
+            client = app.test_client()
+            
+            rv = client.get('/admin/model1/')
+            eq_(rv.status_code, 200)
+            
+            rv = client.get('/admin/model1/new/')
+            eq_(rv.status_code, 200)
+        except:
+            print("Error on the following locale:", locale)
+            raise
     
     locales = ['en', 'cs', 'de', 'es', 'fa', 'fr', 'pt', 'ru', 'zh_CN', 'zh_TW']
     for locale in locales:
