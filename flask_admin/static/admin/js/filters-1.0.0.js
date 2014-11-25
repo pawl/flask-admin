@@ -32,9 +32,9 @@ var AdminFilters = function(element, filtersElement, filterGroups, activeFilters
         return false;
     }
     
-    // allows changing filter input type to one with options
+    // generate HTML for filter input - allows changing filter input type to one with options or tags
     function createFilterInput(inputContainer, filterValue, filter) {
-        if (filter.options) {
+        if (filter.type == "select2") {
             var $field = $('<select class="filter-val" />').attr('name', makeName(filter.arg));
             
             $(filter.options).each(function() {
@@ -47,6 +47,8 @@ var AdminFilters = function(element, filtersElement, filterGroups, activeFilters
                         .val(this[0]).text(this[1]));
                 }
             });
+        } else if (filter.type == "select2-tags") {
+            var $field = $('<input type="hidden" data-tags="" class="filter-val form-control" />').attr('name', makeName(filter.arg));
         } else {
             var $field = $('<input type="text" class="filter-val form-control" />').attr('name', makeName(filter.arg));
         }
@@ -58,19 +60,24 @@ var AdminFilters = function(element, filtersElement, filterGroups, activeFilters
     // add styling to input field, accommodates filters that change the input field's HTML
     function styleFilterInput(filter, field) {
         if (filter.type) {
-            field.attr('data-role', filter.type);
             if ((filter.type == "datepicker") || (filter.type == "daterangepicker")) {
                 field.attr('data-date-format', "YYYY-MM-DD");
-            }
-            else if ((filter.type == "datetimepicker") || (filter.type == "datetimerangepicker")) {
+            } else if ((filter.type == "datetimepicker") || (filter.type == "datetimerangepicker")) {
                 field.attr('data-date-format', "YYYY-MM-DD HH:mm:ss");
-            }
-            else if ((filter.type == "timepicker")  || (filter.type == "timerangepicker")) {
+            } else if ((filter.type == "timepicker")  || (filter.type == "timerangepicker")) {
                 field.attr('data-date-format', "HH:mm:ss");
+            } else if (filter.type == "select2-tags") {
+                var options = [];
+                if (filter.options) {
+                    filter.options.forEach(function(option) {
+                        options.push({id:option[0], text:option[1]});
+                    });
+                }
+                field.attr('data-tags', JSON.stringify(options));
+                
             }
+            
             faForm.applyStyle(field, filter.type);
-        } else if (filter.options) {
-            faForm.applyStyle(field, 'select2');
         }
         
         return field;

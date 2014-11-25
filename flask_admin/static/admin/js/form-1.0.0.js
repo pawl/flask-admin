@@ -102,6 +102,35 @@
 
                 $el.select2(opts);
                 return true;
+            case 'select2-tags':
+                // get tags from element
+                if ($el.attr('data-tags')) {
+                    var tags = JSON.parse($el.attr('data-tags'));
+                } else {
+                    var tags = [];
+                }
+                
+                // default to a comma for separating list items
+                if ($el.attr('data-token-separators')) {
+                    var tokenSeparators = JSON.parse($el.attr('data-tags'));
+                } else {
+                    var tokenSeparators = [','];
+                }
+                
+                var opts = {
+                    width: 'resolve',
+                    tags: tags,
+                    tokenSeparators: tokenSeparators
+                };
+                
+                $.extend(opts, {
+                    formatNoMatches: function() {
+                        return 'Enter comma separated values';
+                    }
+                });
+                
+                $el.select2(opts);
+                return true;
             case 'select2-ajax':
                 processAjaxWidget($el, name);
                 return true;
