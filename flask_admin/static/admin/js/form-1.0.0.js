@@ -130,6 +130,12 @@
                 });
                 
                 $el.select2(opts);
+                
+                // submit on ENTER
+                $el.parent().find('input.select2-input').on('keyup', function(e) {
+                   if(e.keyCode === 13) 
+                      $(this).closest('form').submit();
+                });
                 return true;
             case 'select2-ajax':
                 processAjaxWidget($el, name);
