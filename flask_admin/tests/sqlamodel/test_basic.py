@@ -376,15 +376,15 @@ def test_column_filters():
         ])
 
     # Fill DB
-    model1_obj1 = Model1('model1_obj1', bool_field=True)
-    model1_obj2 = Model1('model1_obj2')
-    model1_obj3 = Model1('model1_obj3')
-    model1_obj4 = Model1('model1_obj4')
+    model1_obj1 = Model1('test1_val_1', 'test2_val_1', bool_field=True)
+    model1_obj2 = Model1('test1_val_2', 'test2_val_2')
+    model1_obj3 = Model1('test1_val_3', 'test2_val_3')
+    model1_obj4 = Model1('test1_val_4', 'test2_val_4')
 
-    model2_obj1 = Model2('model2_obj1', model1=model1_obj1)
-    model2_obj2 = Model2('model2_obj2', model1=model1_obj1)
-    model2_obj3 = Model2('model2_obj3', int_field=5000)
-    model2_obj4 = Model2('model2_obj4', int_field=9000)
+    model2_obj1 = Model2('test2_val_1', model1=model1_obj1)
+    model2_obj2 = Model2('test2_val_2', model1=model1_obj1)
+    model2_obj3 = Model2('test2_val_3', int_field=5000)
+    model2_obj4 = Model2('test2_val_4', int_field=9000)
     
     date_obj1 = Model1('date_obj1', date_field=date(2014,11,17))
     date_obj2 = Model1('date_obj2', date_field=date(2013,10,16))
@@ -396,34 +396,116 @@ def test_column_filters():
     enum_obj1 = Model1('enum_obj1', enum_field="model1_v1")
     enum_obj2 = Model1('enum_obj2', enum_field="model1_v2")
     
+    empty_obj = Model1(test2="empty_obj")
+    
     db.session.add_all([
         model1_obj1, model1_obj2, model1_obj3, model1_obj4,
         model2_obj1, model2_obj2, model2_obj3, model2_obj4,
         date_obj1, timeonly_obj1, datetime_obj1,
         date_obj2, timeonly_obj2, datetime_obj2,
-        enum_obj1, enum_obj2
+        enum_obj1, enum_obj2, empty_obj
     ])
     db.session.commit()
 
     client = app.test_client()
 
-    rv = client.get('/admin/model1/?flt0_0=model1_obj1')
+    rv = client.get('/admin/model1/?flt0_0=test1_val_1')
     eq_(rv.status_code, 200)
     data = rv.data.decode('utf-8')
-    ok_('model1_obj1' in data)
-    ok_('model1_obj2' not in data)
+    # the filter value is always in "data"
+    # need to check a different column than test1 for the expected row
+    ok_('test2_val_1' in data)
+    ok_('test1_val_2' not in data)
 
-    rv = client.get('/admin/model1/?flt0_6=model1_obj1')
+    rv = client.get('/admin/model1/?flt0_6=test1_val_1')
     eq_(rv.status_code, 200)
     data = rv.data.decode('utf-8')
-    ok_('model1_obj1' in data)
-    ok_('model1_obj2' in data)
+    ok_('test2_val_1' not in data)
+    ok_('test1_val_2' in data)
 
+    # Test string filter
+    view = CustomModelView(Model1, db.session,
+                           column_filters=['test1'], endpoint='_strings')
+    admin.add_view(view)
+
+    eq_([(f['index'], f['operation']) for f in view._filter_groups[u'Test1']],
+        [
+            (0, 'equals'),
+            (1, 'not equal'),
+            (2, 'contains'),
+            (3, 'not contains'),
+            (4, 'empty'),
+            (5, 'in list'),
+            (6, 'not in list'),
+        ])
+
+    # string - equals
+    rv = client.get('/admin/_strings/?flt0_0=test1_val_1')
+    eq_(rv.status_code, 200)
+    data = rv.data.decode('utf-8')
+    ok_('test2_val_1' in data)
+    ok_('test1_val_2' not in data)
+    
+    # string - not equal
+    rv = client.get('/admin/_strings/?flt0_1=test1_val_1')
+    eq_(rv.status_code, 200)
+    data = rv.data.decode('utf-8')
+    ok_('test2_val_1' not in data)
+    ok_('test1_val_2' in data)
+    
+    # string - contains
+    rv = client.get('/admin/_strings/?flt0_2=test1_val_1')
+    eq_(rv.status_code, 200)
+    data = rv.data.decode('utf-8')
+    ok_('test2_val_1' in data)
+    ok_('test1_val_2' not in data)
+    
+    # string - not contains
+    rv = client.get('/admin/_strings/?flt0_3=test1_val_1')
+    eq_(rv.status_code, 200)
+    data = rv.data.decode('utf-8')
+    ok_('test2_val_1' not in data)
+    ok_('test1_val_2' in data)
+    
+    # string - empty
+    rv = client.get('/admin/_strings/?flt0_4=1')
+    eq_(rv.status_code, 200)
+    data = rv.data.decode('utf-8')
+    ok_('empty_obj' in data)
+    ok_('test1_val_1' not in data)
+    ok_('test1_val_2' not in data)
+    
+    # string - not empty
+    rv = client.get('/admin/_strings/?flt0_4=0')
+    eq_(rv.status_code, 200)
+    data = rv.data.decode('utf-8')
+    ok_('empty_obj' not in data)
+    ok_('test1_val_1' in data)
+    ok_('test1_val_2' in data)
+    
+    # string - in list
+    rv = client.get('/admin/_strings/?flt0_5=test1_val_1%2Ctest1_val_2')
+    eq_(rv.status_code, 200)
+    data = rv.data.decode('utf-8')
+    ok_('test2_val_1' in data)
+    ok_('test2_val_2' in data)
+    ok_('test1_val_3' not in data)
+    ok_('test1_val_4' not in data)
+    
+    # string - not in list
+    rv = client.get('/admin/_strings/?flt0_6=test1_val_1%2Ctest1_val_2')
+    eq_(rv.status_code, 200)
+    data = rv.data.decode('utf-8')
+    ok_('test2_val_1' not in data)
+    ok_('test2_val_2' not in data)
+    ok_('test1_val_3' in data)
+    ok_('test1_val_4' in data)
+    
     # Test numeric filter
     view = CustomModelView(Model2, db.session,
                            column_filters=['int_field'])
     admin.add_view(view)
-
+    
     eq_([(f['index'], f['operation']) for f in view._filter_groups[u'Int Field']],
         [
             (0, 'equals'),
@@ -439,65 +521,65 @@ def test_column_filters():
     rv = client.get('/admin/model2/?flt0_0=5000')
     eq_(rv.status_code, 200)
     data = rv.data.decode('utf-8')
-    ok_('model2_obj3' in data)
-    ok_('model2_obj4' not in data)
+    ok_('test2_val_3' in data)
+    ok_('test2_val_4' not in data)
     
     # integer - not equal
     rv = client.get('/admin/model2/?flt0_1=5000')
     eq_(rv.status_code, 200)
     data = rv.data.decode('utf-8')
-    ok_('model2_obj3' not in data)
-    ok_('model2_obj4' in data)
+    ok_('test2_val_3' not in data)
+    ok_('test2_val_4' in data)
     
     # integer - greater
     rv = client.get('/admin/model2/?flt0_2=6000')
     eq_(rv.status_code, 200)
     data = rv.data.decode('utf-8')
-    ok_('model2_obj3' not in data)
-    ok_('model2_obj4' in data)
+    ok_('test2_val_3' not in data)
+    ok_('test2_val_4' in data)
     
     # integer - smaller
     rv = client.get('/admin/model2/?flt0_3=6000')
     eq_(rv.status_code, 200)
     data = rv.data.decode('utf-8')
-    ok_('model2_obj3' in data)
-    ok_('model2_obj4' not in data)
+    ok_('test2_val_3' in data)
+    ok_('test2_val_4' not in data)
     
     # integer - empty
     rv = client.get('/admin/model2/?flt0_4=1')
     eq_(rv.status_code, 200)
     data = rv.data.decode('utf-8')
-    ok_('model2_obj1' in data)
-    ok_('model2_obj2' in data)
-    ok_('model2_obj3' not in data)
-    ok_('model2_obj4' not in data)
+    ok_('test2_val_1' in data)
+    ok_('test2_val_2' in data)
+    ok_('test2_val_3' not in data)
+    ok_('test2_val_4' not in data)
     
     # integer - not empty
     rv = client.get('/admin/model2/?flt0_4=0')
     eq_(rv.status_code, 200)
     data = rv.data.decode('utf-8')
-    ok_('model2_obj1' not in data)
-    ok_('model2_obj2' not in data)
-    ok_('model2_obj3' in data)
-    ok_('model2_obj4' in data)
+    ok_('test2_val_1' not in data)
+    ok_('test2_val_2' not in data)
+    ok_('test2_val_3' in data)
+    ok_('test2_val_4' in data)
     
     # integer - in list
     rv = client.get('/admin/model2/?flt0_5=5000%2C9000')
     eq_(rv.status_code, 200)
     data = rv.data.decode('utf-8')
-    ok_('model2_obj1' not in data)
-    ok_('model2_obj2' not in data)
-    ok_('model2_obj3' in data)
-    ok_('model2_obj4' in data)
+    ok_('test2_val_1' not in data)
+    ok_('test2_val_2' not in data)
+    ok_('test2_val_3' in data)
+    ok_('test2_val_4' in data)
     
     # integer - not in list
     rv = client.get('/admin/model2/?flt0_6=5000%2C9000')
     eq_(rv.status_code, 200)
     data = rv.data.decode('utf-8')
-    ok_('model2_obj1' in data)
-    ok_('model2_obj2' in data)
-    ok_('model2_obj3' not in data)
-    ok_('model2_obj4' not in data)    
+    ok_('test2_val_1' in data)
+    ok_('test2_val_2' in data)
+    ok_('test2_val_3' not in data)
+    ok_('test2_val_4' not in data)    
     
     # Test filters to joined table field
     view = CustomModelView(
@@ -515,10 +597,10 @@ def test_column_filters():
     rv = client.get('/admin/_model2/?flt1_0=1')
     eq_(rv.status_code, 200)
     data = rv.data.decode('utf-8')
-    ok_('model2_obj1' in data)
-    ok_('model2_obj2' in data)
-    ok_('model2_obj3' not in data)
-    ok_('model2_obj4' not in data)
+    ok_('test2_val_1' in data)
+    ok_('test2_val_2' in data)
+    ok_('test2_val_3' not in data)
+    ok_('test2_val_4' not in data)
 
     # Test human readable URLs
     view = CustomModelView(
@@ -529,11 +611,11 @@ def test_column_filters():
     )
     admin.add_view(view)
 
-    rv = client.get('/admin/_model3/?flt1_test1_equals=model1_obj1')
+    rv = client.get('/admin/_model3/?flt1_test1_equals=test1_val_1')
     eq_(rv.status_code, 200)
     data = rv.data.decode('utf-8')
-    ok_('model1_obj1' in data)
-    ok_('model1_obj2' not in data)
+    ok_('test1_val_1' in data)
+    ok_('test1_val_2' not in data)
     
     # Test date, time, and datetime filters
     view = CustomModelView(Model1, db.session,
@@ -620,7 +702,7 @@ def test_column_filters():
     rv = client.get('/admin/_datetime/?flt0_6=1')
     eq_(rv.status_code, 200)
     data = rv.data.decode('utf-8')
-    ok_('model1_obj1' in data)
+    ok_('test1_val_1' in data)
     ok_('date_obj1' not in data)
     ok_('date_obj2' not in data)
     
@@ -628,7 +710,7 @@ def test_column_filters():
     rv = client.get('/admin/_datetime/?flt0_6=0')
     eq_(rv.status_code, 200)
     data = rv.data.decode('utf-8')
-    ok_('model1_obj1' not in data)
+    ok_('test1_val_1' not in data)
     ok_('date_obj1' in data)
     ok_('date_obj2' in data)
     
@@ -678,7 +760,7 @@ def test_column_filters():
     rv = client.get('/admin/_datetime/?flt0_13=1')
     eq_(rv.status_code, 200)
     data = rv.data.decode('utf-8')
-    ok_('model1_obj1' in data)
+    ok_('test1_val_1' in data)
     ok_('datetime_obj1' not in data)
     ok_('datetime_obj2' not in data)
     
@@ -686,7 +768,7 @@ def test_column_filters():
     rv = client.get('/admin/_datetime/?flt0_13=0')
     eq_(rv.status_code, 200)
     data = rv.data.decode('utf-8')
-    ok_('model1_obj1' not in data)
+    ok_('test1_val_1' not in data)
     ok_('datetime_obj1' in data)
     ok_('datetime_obj2' in data)
     
@@ -736,7 +818,7 @@ def test_column_filters():
     rv = client.get('/admin/_datetime/?flt0_20=1')
     eq_(rv.status_code, 200)
     data = rv.data.decode('utf-8')
-    ok_('model1_obj1' in data)
+    ok_('test1_val_1' in data)
     ok_('timeonly_obj1' not in data)
     ok_('timeonly_obj2' not in data)
     
@@ -744,7 +826,7 @@ def test_column_filters():
     rv = client.get('/admin/_datetime/?flt0_20=0')
     eq_(rv.status_code, 200)
     data = rv.data.decode('utf-8')
-    ok_('model1_obj1' not in data)
+    ok_('test1_val_1' not in data)
     ok_('timeonly_obj1' in data)
     ok_('timeonly_obj2' in data)
     
@@ -772,7 +854,7 @@ def test_column_filters():
     rv = client.get('/admin/_enumfield/?flt0_2=1')
     eq_(rv.status_code, 200)
     data = rv.data.decode('utf-8')
-    ok_('model1_obj1' in data)
+    ok_('test1_val_1' in data)
     ok_('enum_obj1' not in data)
     ok_('enum_obj2' not in data)
     
@@ -780,7 +862,7 @@ def test_column_filters():
     rv = client.get('/admin/_enumfield/?flt0_2=0')
     eq_(rv.status_code, 200)
     data = rv.data.decode('utf-8')
-    ok_('model1_obj1' not in data)
+    ok_('test1_val_1' not in data)
     ok_('enum_obj1' in data)
     ok_('enum_obj2' in data)
     
@@ -788,7 +870,7 @@ def test_column_filters():
     rv = client.get('/admin/_enumfield/?flt0_3=model1_v1%2Cmodel1_v2')
     eq_(rv.status_code, 200)
     data = rv.data.decode('utf-8')
-    ok_('model1_obj1' not in data)
+    ok_('test1_val_1' not in data)
     ok_('enum_obj1' in data)
     ok_('enum_obj2' in data)
     
@@ -796,7 +878,7 @@ def test_column_filters():
     rv = client.get('/admin/_enumfield/?flt0_4=model1_v1%2Cmodel1_v2')
     eq_(rv.status_code, 200)
     data = rv.data.decode('utf-8')
-    ok_('model1_obj1' in data)
+    ok_('test1_val_1' in data)
     ok_('enum_obj1' not in data)
     ok_('enum_obj2' not in data)
     
