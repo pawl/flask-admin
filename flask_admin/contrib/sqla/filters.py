@@ -105,6 +105,14 @@ class FilterInList(BaseSQLAFilter):
         return lazy_gettext('in list')
         
 
+class FilterNotInList(FilterInList):
+    def apply(self, query, value):
+        return query.filter(~self.column.in_(value))
+    
+    def operation(self):
+        return lazy_gettext('not in list')
+        
+
 # Customized type filters
 class BooleanEqualFilter(FilterEqual, filters.BaseBooleanFilter):
     pass
@@ -267,10 +275,10 @@ class TimeNotBetweenFilter(TimeBetweenFilter):
             
 # Base SQLA filter field converter
 class FilterConverter(filters.BaseFilterConverter):
-    strings = (FilterEqual, FilterNotEqual, FilterLike, FilterNotLike, FilterEmpty, FilterInList)
-    numeric = (FilterEqual, FilterNotEqual, FilterGreater, FilterSmaller, FilterEmpty, FilterInList)
+    strings = (FilterEqual, FilterNotEqual, FilterLike, FilterNotLike, FilterEmpty, FilterInList, FilterNotInList)
+    numeric = (FilterEqual, FilterNotEqual, FilterGreater, FilterSmaller, FilterEmpty, FilterInList, FilterNotInList)
     bool = (BooleanEqualFilter, BooleanNotEqualFilter)
-    enum = (FilterEqual, FilterNotEqual, FilterEmpty, FilterInList)
+    enum = (FilterEqual, FilterNotEqual, FilterEmpty, FilterInList, FilterNotInList)
     date_filters = (DateEqualFilter, DateNotEqualFilter, DateGreaterFilter, DateSmallerFilter, 
             DateBetweenFilter, DateNotBetweenFilter, FilterEmpty)
     datetime_filters = (DateTimeEqualFilter, DateTimeNotEqualFilter, DateTimeGreaterFilter, 
@@ -278,40 +286,40 @@ class FilterConverter(filters.BaseFilterConverter):
                 FilterEmpty)
     time_filters = (TimeEqualFilter, TimeNotEqualFilter, TimeGreaterFilter, TimeSmallerFilter, 
             TimeBetweenFilter, TimeNotBetweenFilter, FilterEmpty)
-
+            
     def convert(self, type_name, column, name, **kwargs):
         if type_name.lower() in self.converters:
             return self.converters[type_name.lower()](column, name, **kwargs)
         return None
-
+        
     @filters.convert('string', 'char', 'unicode', 'varchar', 'tinytext',
                      'text', 'mediumtext', 'longtext', 'unicodetext',
                      'nchar', 'nvarchar', 'ntext')
     def conv_string(self, column, name, **kwargs):
         return [f(column, name, **kwargs) for f in self.strings]
-
+        
     @filters.convert('boolean', 'tinyint')
     def conv_bool(self, column, name, **kwargs):
         return [f(column, name, **kwargs) for f in self.bool]
-
+        
     @filters.convert('int', 'integer', 'smallinteger', 'smallint', 'numeric',
                      'float', 'real', 'biginteger', 'bigint', 'decimal',
                      'double_precision', 'double', 'mediumint')
     def conv_int(self, column, name, **kwargs):
         return [f(column, name, **kwargs) for f in self.numeric]
-
+        
     @filters.convert('date')
     def conv_date(self, column, name, **kwargs):
         return [f(column, name, **kwargs) for f in self.date_filters]
-
+        
     @filters.convert('datetime', 'datetime2', 'timestamp', 'smalldatetime')
     def conv_datetime(self, column, name, **kwargs):
         return [f(column, name, **kwargs) for f in self.datetime_filters]
-                
+        
     @filters.convert('time')
     def conv_time(self, column, name, **kwargs):
         return [f(column, name, **kwargs) for f in self.time_filters]
-
+        
     @filters.convert('enum')
     def conv_enum(self, column, name, options=None, **kwargs):
         # set all operations to select2

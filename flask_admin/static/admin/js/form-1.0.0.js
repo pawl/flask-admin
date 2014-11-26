@@ -111,6 +111,7 @@
                 }
                 
                 // default to a comma for separating list items
+                // allows using spaces as a token separator
                 if ($el.attr('data-token-separators')) {
                     var tokenSeparators = JSON.parse($el.attr('data-tags'));
                 } else {

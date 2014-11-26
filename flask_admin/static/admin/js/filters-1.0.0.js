@@ -48,9 +48,16 @@ var AdminFilters = function(element, filtersElement, filterGroups, activeFilters
                 }
             });
         } else if (filter.type == "select2-tags") {
-            var $field = $('<input type="hidden" data-tags="" class="filter-val form-control" />').attr('name', makeName(filter.arg));
+            var $field = $('<input type="hidden" class="filter-val form-control" />').attr('name', makeName(filter.arg));
+            if (filterValue) {
+                // for active filters - populate tags by setting html value attribute
+                $field.val(filterValue);
+            }
         } else {
             var $field = $('<input type="text" class="filter-val form-control" />').attr('name', makeName(filter.arg));
+            if (filterValue) {
+                $field.val(filterValue);
+            }
         }
         inputContainer.replaceWith($('<td/>').append($field));
         
@@ -72,9 +79,8 @@ var AdminFilters = function(element, filtersElement, filterGroups, activeFilters
                     filter.options.forEach(function(option) {
                         options.push({id:option[0], text:option[1]});
                     });
+                    field.attr('data-tags', JSON.stringify(options));
                 }
-                field.attr('data-tags', JSON.stringify(options));
-                
             }
             
             faForm.applyStyle(field, filter.type);
@@ -153,10 +159,7 @@ var AdminFilters = function(element, filtersElement, filterGroups, activeFilters
         var idx = activeFilter[0],
             name = activeFilter[1],
             filterValue = activeFilter[2];
-        var $activeField = addFilter(name, filterGroups[name], idx, filterValue);
-        
-        // set value of newly created field
-        $activeField.val(filterValue);
+        var $activeField = addFilter(name, filterGroups[name], idx, filterValue);        
     });
 
     $('.filter-val', $root).on('input change', function() {

@@ -289,7 +289,7 @@ def test_column_filters():
     )
     admin.add_view(view)
 
-    eq_(len(view._filters), 6)
+    eq_(len(view._filters), 7)
 
     eq_([(f['index'], f['operation']) for f in view._filter_groups[u'Test1']],
         [
@@ -299,6 +299,7 @@ def test_column_filters():
             (3, u'not contains'),
             (4, u'empty'),
             (5, u'in list'),
+            (6, u'not in list'),
         ])
 
     # Test filter that references property
@@ -313,50 +314,55 @@ def test_column_filters():
             (3, u'not contains'),
             (4, u'empty'),
             (5, u'in list'),
+            (6, u'not in list'),
         ])
 
     eq_([(f['index'], f['operation']) for f in view._filter_groups[u'Model1 / Test2']],
         [
-            (6, u'equals'),
-            (7, u'not equal'),
-            (8, u'contains'),
-            (9, u'not contains'),
-            (10, u'empty'),
-            (11, u'in list'),
+            (7, u'equals'),
+            (8, u'not equal'),
+            (9, u'contains'),
+            (10, u'not contains'),
+            (11, u'empty'),
+            (12, u'in list'),
+            (13, u'not in list'),
         ])
 
     eq_([(f['index'], f['operation']) for f in view._filter_groups[u'Model1 / Test3']],
         [
-            (12, u'equals'),
-            (13, u'not equal'),
-            (14, u'contains'),
-            (15, u'not contains'),
-            (16, u'empty'),
-            (17, u'in list'),
+            (14, u'equals'),
+            (15, u'not equal'),
+            (16, u'contains'),
+            (17, u'not contains'),
+            (18, u'empty'),
+            (19, u'in list'),
+            (20, u'not in list'),
         ])
 
     eq_([(f['index'], f['operation']) for f in view._filter_groups[u'Model1 / Test4']],
         [
-            (18, u'equals'),
-            (19, u'not equal'),
-            (20, u'contains'),
-            (21, u'not contains'),
-            (22, u'empty'),
-            (23, u'in list'),
+            (21, u'equals'),
+            (22, u'not equal'),
+            (23, u'contains'),
+            (24, u'not contains'),
+            (25, u'empty'),
+            (26, u'in list'),
+            (27, u'not in list'),
         ])
 
     eq_([(f['index'], f['operation']) for f in view._filter_groups[u'Model1 / Bool Field']],
         [
-            (24, u'equals'),
-            (25, u'not equal'),
+            (28, u'equals'),
+            (29, u'not equal'),
         ])
 
     eq_([(f['index'], f['operation']) for f in view._filter_groups[u'Model1 / Enum Field']],
         [
-            (26, u'equals'),
-            (27, u'not equal'),
-            (28, u'empty'),
-            (29, u'in list'),
+            (30, u'equals'),
+            (31, u'not equal'),
+            (32, u'empty'),
+            (33, u'in list'),
+            (34, u'not in list'),
         ])
 
     # Test filter with a dot
@@ -377,8 +383,8 @@ def test_column_filters():
 
     model2_obj1 = Model2('model2_obj1', model1=model1_obj1)
     model2_obj2 = Model2('model2_obj2', model1=model1_obj1)
-    model2_obj3 = Model2('model2_obj3')
-    model2_obj4 = Model2('model2_obj4')
+    model2_obj3 = Model2('model2_obj3', int_field=5000)
+    model2_obj4 = Model2('model2_obj4', int_field=9000)
     
     date_obj1 = Model1('date_obj1', date_field=date(2014,11,17))
     date_obj2 = Model1('date_obj2', date_field=date(2013,10,16))
@@ -426,8 +432,73 @@ def test_column_filters():
             (3, 'smaller than'),
             (4, 'empty'),
             (5, 'in list'),
+            (6, 'not in list'),
         ])
 
+    # integer - equals
+    rv = client.get('/admin/model2/?flt0_0=5000')
+    eq_(rv.status_code, 200)
+    data = rv.data.decode('utf-8')
+    ok_('model2_obj3' in data)
+    ok_('model2_obj4' not in data)
+    
+    # integer - not equal
+    rv = client.get('/admin/model2/?flt0_1=5000')
+    eq_(rv.status_code, 200)
+    data = rv.data.decode('utf-8')
+    ok_('model2_obj3' not in data)
+    ok_('model2_obj4' in data)
+    
+    # integer - greater
+    rv = client.get('/admin/model2/?flt0_2=6000')
+    eq_(rv.status_code, 200)
+    data = rv.data.decode('utf-8')
+    ok_('model2_obj3' not in data)
+    ok_('model2_obj4' in data)
+    
+    # integer - smaller
+    rv = client.get('/admin/model2/?flt0_3=6000')
+    eq_(rv.status_code, 200)
+    data = rv.data.decode('utf-8')
+    ok_('model2_obj3' in data)
+    ok_('model2_obj4' not in data)
+    
+    # integer - empty
+    rv = client.get('/admin/model2/?flt0_4=1')
+    eq_(rv.status_code, 200)
+    data = rv.data.decode('utf-8')
+    ok_('model2_obj1' in data)
+    ok_('model2_obj2' in data)
+    ok_('model2_obj3' not in data)
+    ok_('model2_obj4' not in data)
+    
+    # integer - not empty
+    rv = client.get('/admin/model2/?flt0_4=0')
+    eq_(rv.status_code, 200)
+    data = rv.data.decode('utf-8')
+    ok_('model2_obj1' not in data)
+    ok_('model2_obj2' not in data)
+    ok_('model2_obj3' in data)
+    ok_('model2_obj4' in data)
+    
+    # integer - in list
+    rv = client.get('/admin/model2/?flt0_5=5000%2C9000')
+    eq_(rv.status_code, 200)
+    data = rv.data.decode('utf-8')
+    ok_('model2_obj1' not in data)
+    ok_('model2_obj2' not in data)
+    ok_('model2_obj3' in data)
+    ok_('model2_obj4' in data)
+    
+    # integer - not in list
+    rv = client.get('/admin/model2/?flt0_6=5000%2C9000')
+    eq_(rv.status_code, 200)
+    data = rv.data.decode('utf-8')
+    ok_('model2_obj1' in data)
+    ok_('model2_obj2' in data)
+    ok_('model2_obj3' not in data)
+    ok_('model2_obj4' not in data)    
+    
     # Test filters to joined table field
     view = CustomModelView(
         Model2, db.session,
@@ -720,6 +791,14 @@ def test_column_filters():
     ok_('model1_obj1' not in data)
     ok_('enum_obj1' in data)
     ok_('enum_obj2' in data)
+    
+    # enum - not in list
+    rv = client.get('/admin/_enumfield/?flt0_4=model1_v1%2Cmodel1_v2')
+    eq_(rv.status_code, 200)
+    data = rv.data.decode('utf-8')
+    ok_('model1_obj1' in data)
+    ok_('enum_obj1' not in data)
+    ok_('enum_obj2' not in data)
     
 def test_url_args():
     app, db, admin = setup()
