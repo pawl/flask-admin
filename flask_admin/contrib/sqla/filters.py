@@ -107,7 +107,7 @@ class FilterInList(BaseSQLAFilter):
 
 class FilterNotInList(FilterInList):
     def apply(self, query, value):
-        # NOT IN can exclude NULL rows, so or_ None needed to be added
+        # NOT IN can exclude NULL values, so "or_ == None" needed to be added
         return query.filter(or_(~self.column.in_(value), self.column == None))
     
     def operation(self):
