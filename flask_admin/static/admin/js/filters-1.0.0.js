@@ -2,23 +2,23 @@ var AdminFilters = function(element, filtersElement, filterGroups, activeFilters
     var $root = $(element);
     var $container = $('.filters', $root);
     var lastCount = 0;
-
+    
     function getCount(name) {
         var idx = name.indexOf('_');
-
+        
         if (idx === -1) {
             return 0;
         }
-
+        
         return parseInt(name.substr(3, idx - 3), 10);
     }
-
+    
     function makeName(name) {
         var result = 'flt' + lastCount + '_' + name;
         lastCount += 1;
         return result;
     }
-
+    
     function removeFilter() {
         $(this).closest('tr').remove();
         if($('.filters tr').length == 0) {
