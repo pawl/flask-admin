@@ -5,7 +5,7 @@ import datetime
 from flask.ext.admin.babel import lazy_gettext
 from flask.ext.admin.model import filters
 from flask.ext.admin.contrib.sqla import tools
-from sqlalchemy.sql import not_
+from sqlalchemy.sql import not_, or_
 
 class BaseSQLAFilter(filters.BaseFilter):
     """
@@ -107,7 +107,8 @@ class FilterInList(BaseSQLAFilter):
 
 class FilterNotInList(FilterInList):
     def apply(self, query, value):
-        return query.filter(~self.column.in_(value))
+        # NOT IN can exclude NULL rows, so or_ None needed to be added
+        return query.filter(or_(~self.column.in_(value), self.column == None))
     
     def operation(self):
         return lazy_gettext('not in list')
