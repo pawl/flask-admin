@@ -99,8 +99,6 @@ var AdminFilters = function(element, filtersElement, filterGroups, activeFilters
     }
     
     function addFilter(name, subfilters, selectedIndex, filterValue) {
-        console.log(filterValue);
-        console.log("test");
         var $el = $('<tr />').appendTo($container);
         
         // Filter list
@@ -164,7 +162,7 @@ var AdminFilters = function(element, filtersElement, filterGroups, activeFilters
         var $activeField = addFilter(name, filterGroups[name], idx, filterValue);        
     });
     
-    // show Apply Filter when filter input is changed
+    // show "Apply Filter" button when filter input is changed
     $('.filter-val', $root).on('input change', function() {
         $('button', $root).show();
     });
