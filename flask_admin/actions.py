@@ -5,7 +5,7 @@ from flask.ext.admin import tools
 from flask.ext.admin._compat import text_type
 
 
-def action(name, text, confirmation=None):
+def action(name, text, confirmation=None, dropdown=True):
     """
         Use this decorator to expose actions that span more than one
         entity (model, file, etc)
@@ -17,9 +17,12 @@ def action(name, text, confirmation=None):
         :param confirmation:
             Confirmation text. If not provided, action will be executed
             unconditionally.
+        :param dropdown:
+            Determines whether the action appears in the dropdown.
+            If not provided, the action will appear in the dropdown.
     """
     def wrap(f):
-        f._action = (name, text, confirmation)
+        f._action = (name, text, confirmation, dropdown)
         return f
 
     return wrap
@@ -57,14 +60,14 @@ class ActionsMixin(object):
             attr = tools.get_dict_attr(self, p)
 
             if hasattr(attr, '_action'):
-                name, text, desc = attr._action
+                name, text, desc, dropdown = attr._action
 
-                self._actions.append((name, text))
+                self._actions.append((name, text, dropdown))
 
                 # TODO: Use namedtuple
                 # Reason why we need getattr here - what's in attr is not
                 # bound to the object.
-                self._actions_data[name] = (getattr(self, p), text, desc)
+                self._actions_data[name] = (getattr(self, p), text, desc, dropdown)
 
     def is_action_allowed(self, name):
         """
@@ -83,10 +86,10 @@ class ActionsMixin(object):
         actions_confirmation = {}
 
         for act in self._actions:
-            name, text = act
+            name, text, dropdown = act
 
             if self.is_action_allowed(name):
-                actions.append((name, text_type(text)))
+                actions.append((name, text_type(text), dropdown))
 
                 confirmation = self._actions_data[name][2]
                 if confirmation:

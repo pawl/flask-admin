@@ -28,9 +28,8 @@
         {% endif %}
 
         {% if actions %}
-        <li class="dropdown">
+            {{ actionlib.buttons(actions) }}
             {{ actionlib.dropdown(actions) }}
-        </li>
         {% endif %}
 
         {% if search_supported %}

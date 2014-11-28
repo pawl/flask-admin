@@ -1,19 +1,37 @@
 {% import 'admin/static.html' as admin_static with context %}
 
-{% macro dropdown(actions, btn_class='btn dropdown-toggle') -%}
-    <a class="{{ btn_class }}" data-toggle="dropdown" href="javascript:void(0)">{{ _gettext('With selected') }}<b class="caret"></b></a>
-    <ul class="dropdown-menu">
-        {% for p in actions %}
+{% macro dropdown(actions, btn_class='dropdown-toggle') -%}
+    <li class="dropdown">
+        <a class="{{ btn_class }}" data-toggle="dropdown" href="javascript:void(0)">{{ _gettext('With selected') }}<b class="caret"></b></a>
+        <ul class="dropdown-menu">
+            {% for action in actions %}
+                {# determine if action is dropdown #}
+                {% if action[2] %}
+                <li>
+                    <a href="javascript:void(0)" onclick="return modelActions.execute('{{ action[0] }}');">{{ _gettext(action[1]) }}</a>
+                </li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+    </li>
+{% endmacro %}
+
+{% macro buttons(actions, btn_class='btn btn-default') -%}
+    {% for action in actions %}
+        {# determine if action is not dropdown #}
+        {% if not action[2] %}
         <li>
-            <a href="javascript:void(0)" onclick="return modelActions.execute('{{ p[0] }}');">{{ _gettext(p[1]) }}</a>
+            <a href="#" onclick="return modelActions.execute('{{ action[0] }}');">
+                {{ _gettext(action[1]) }}
+            </a>
         </li>
-        {% endfor %}
-    </ul>
+        {% endif %}
+    {% endfor %}
 {% endmacro %}
 
 {% macro form(actions, url) %}
     {% if actions %}
-    <form id="action_form" action="{{ url }}" method="POST" style="display: none">
+    <form id="action_form" action="{{ url }}" method="GET" style="display: none">
         {% if csrf_token %}
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
         {% endif %}
