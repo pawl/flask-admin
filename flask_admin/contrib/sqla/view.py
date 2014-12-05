@@ -120,7 +120,9 @@ class ModelView(BaseModelView):
                 column_filters = ('user', 'email')
 
         or::
-
+            
+            from flask.ext.admin.contrib.sqla.filters import BooleanEqualFilter
+            
             class MyModelView(BaseModelView):
                 column_filters = (BooleanEqualFilter(User.name, 'Name'))
     """
@@ -500,6 +502,30 @@ class ModelView(BaseModelView):
 
         return name in ('string', 'unicode', 'text', 'unicodetext', 'varchar')
 
+    def refresh_autocompleted_choices(self, query_result):
+        """
+            Fills column_choices with all possible values. Only occurs on filters in column_choices_autocomplete. 
+        """
+        for name in self.column_choices_autocomplete:
+            if name in self.column_filters:
+                self.column_choices[name] = []
+                column_obj = getattr(self.model, name)
+                for row in self.session.query(column_obj.distinct()) \
+                                       .filter(column_obj != None) \
+                                       .order_by(column_obj).all():
+                    try:
+                        self.column_choices[name].append((row[0], row[0]))
+                    except KeyError:
+                        self.column_choices[name] = [(row[0], row[0])]
+            else:
+                raise Exception("Cannot auto-complete filter that does not exist: %s" % (name))
+                
+        # refresh column choices map (prevents AttributeError)
+        self._column_choices_map = dict([
+            (column, dict(choices))
+            for column, choices in self.column_choices.items()
+        ])
+                                    
     def scaffold_filters(self, name):
         """
             Return list of enabled filters
@@ -563,7 +589,7 @@ class ModelView(BaseModelView):
 
             if join_tables:
                 self._filter_joins[column.table.name] = join_tables
-
+            
             flt = self.filter_converter.convert(
                 type_name,
                 column,

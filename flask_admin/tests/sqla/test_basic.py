@@ -989,6 +989,29 @@ def test_column_filters():
     ok_('enum_obj1' not in data)
     ok_('enum_obj2' not in data)
     
+    # Test filter autocomplete
+    view = CustomModelView(Model1, db.session, column_filters=['test1'],
+                           endpoint='_autocomplete',
+                           column_choices_autocomplete=['test1'])
+    admin.add_view(view)
+
+    rv = client.get('/admin/_autocomplete/')
+    eq_(rv.status_code, 200)
+    
+    eq_(view._filter_groups[u'Test1'][0]['options'],
+        [(u'date_obj1', u'date_obj1'),
+         (u'date_obj2', u'date_obj2'),
+         (u'datetime_obj1', u'datetime_obj1'),
+         (u'datetime_obj2', u'datetime_obj2'), 
+         (u'enum_obj1', u'enum_obj1'), 
+         (u'enum_obj2', u'enum_obj2'),
+         (u'test1_val_1', u'test1_val_1'), 
+         (u'test1_val_2', u'test1_val_2'), 
+         (u'test1_val_3', u'test1_val_3'), 
+         (u'test1_val_4', u'test1_val_4'), 
+         (u'timeonly_obj1', u'timeonly_obj1'), 
+         (u'timeonly_obj2', u'timeonly_obj2')])
+    
 def test_url_args():
     app, db, admin = setup()
 

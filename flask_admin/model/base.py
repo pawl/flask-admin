@@ -266,7 +266,8 @@ class BaseModelView(BaseView, ActionsMixin):
 
     column_choices = None
     """
-        Map choices to columns in list view
+        Maps raw values in the list view to different values. 
+        Also adds choices to filters in the list view.
 
         Example::
 
@@ -277,7 +278,23 @@ class BaseModelView(BaseView, ActionsMixin):
                     ]
                 }
     """
+    
+    column_choices_autocomplete = None
+    """
+        * Automatically adds an option for each of the column's distinct values to column_choices. 
+        * Overwrites column_choices.
+        * Provides auto-completion for filters.
+        
+        Warning: Each auto-completed column should have an index in the database to avoid speed issues.
+        
+        Must contain a list or tuple of field names.
 
+        Example::
+
+            class MyModelView(BaseModelView):
+                column_choices_autocomplete = ('user', 'email')
+    """
+    
     column_filters = None
     """
         Collection of the column filters.
@@ -289,7 +306,7 @@ class BaseModelView(BaseView, ActionsMixin):
             class MyModelView(BaseModelView):
                 column_filters = ('user', 'email')
     """
-
+    
     named_filter_urls = False
     """
         Set to True to use human-readable names for filters in URL parameters.
@@ -772,7 +789,13 @@ class BaseModelView(BaseView, ActionsMixin):
                 Filter object to verify.
         """
         return isinstance(filter, filters.BaseFilter)
-
+        
+    def refresh_autocompleted_choices(self, query_result):
+        """
+            Fills column_choices with all possible values. Only occurs on filters in column_choices_autocomplete. 
+        """
+        raise NotImplementedError('Please implement refresh_autocompleted_choices method')
+        
     def get_filters(self):
         """
             Return a list of filter objects.
@@ -1280,6 +1303,11 @@ class BaseModelView(BaseView, ActionsMixin):
                                                               search=None,
                                                               filters=None))
 
+        # Refresh autocompleted filter options for current data
+        if self.column_choices_autocomplete:
+            self.refresh_autocompleted_choices(data)
+            self._refresh_filters_cache()
+            
         return self.render(self.list_template,
                                data=data,
                                # List
