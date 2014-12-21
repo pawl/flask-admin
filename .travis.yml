@@ -8,8 +8,14 @@ env:
   - REQUIREMENTS=travis_wtf1.txt
   - REQUIREMENTS=travis_wtf2.txt
 
-install: "pip install -r $REQUIREMENTS --use-mirrors"
-
+install: 
+ - "pip install -r $REQUIREMENTS --use-mirrors"
+  - pip install coveralls
 services: mongodb
 
-script: nosetests flask_admin/tests
+script:
+ - nosetests flask_admin/tests
+ - coverage run --source=flask-admin setup.py test
+
+after_success:
+ - coveralls
