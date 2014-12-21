@@ -2,7 +2,10 @@ Flask-Admin
 ===========
 
 .. image:: https://travis-ci.org/mrjoes/flask-admin.png?branch=master
-	:target: https://travis-ci.org/mrjoes/flask-admin
+  :target: https://travis-ci.org/mrjoes/flask-admin
+
+.. image:: https://coveralls.io/repos/pawl/flask-admin/badge.png
+  :target: https://coveralls.io/r/pawl/flask-admin
 
 Introduction
 ------------
