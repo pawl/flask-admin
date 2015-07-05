@@ -1,6 +1,6 @@
 import os
 import os.path as op
-from flask import Flask
+from flask import Flask, flash
 from flask_sqlalchemy import SQLAlchemy
 
 from wtforms import validators
@@ -28,6 +28,7 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     first_name = db.Column(db.String(100))
     last_name = db.Column(db.String(100))
+    test = db.Column(db.Boolean())
     username = db.Column(db.String(80), unique=True)
     email = db.Column(db.String(120), unique=True)
 
@@ -92,16 +93,23 @@ class Tree(db.Model):
 # Flask views
 @app.route('/')
 def index():
+    flash('test', 'success')
     return '<a href="/admin/">Click me to get to Admin!</a>'
 
 
 # Customized User model admin
 class UserAdmin(sqla.ModelView):
+    edit_modal = True
+    create_modal = True
+
     inline_models = (UserInfo,)
 
 
 # Customized Post model admin
 class PostAdmin(sqla.ModelView):
+    edit_modal = True
+    create_modal = True
+
     # Visible columns in the list view
     column_exclude_list = ['text']
 
@@ -144,7 +152,7 @@ class TreeView(sqla.ModelView):
 
 
 # Create admin
-admin = admin.Admin(app, name='Example: SQLAlchemy', template_mode='bootstrap3')
+admin = admin.Admin(app, name='Example: SQLAlchemy', template_mode='zurb5')
 
 # Add views
 admin.add_view(UserAdmin(User, db.session))
@@ -269,4 +277,4 @@ if __name__ == '__main__':
         build_sample_db()
 
     # Start app
-    app.run(debug=True)
+    app.run(debug=True, host="0.0.0.0", port=5004)
