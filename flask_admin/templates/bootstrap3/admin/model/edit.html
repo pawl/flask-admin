@@ -28,6 +28,20 @@
                            is_modal=admin_view.edit_modal) }}
       </div>
     {%- else -%}
+      {% block navlinks %}
+        <ul class="nav nav-tabs">
+          <li>
+              <a href="{{ return_url }}">{{ _gettext('List') }}</a>
+          </li>
+          <li>
+              <a href="{{ get_url('.create_view', url=return_url) }}">{{ _gettext('Create') }}</a>
+          </li>
+          <li class="active">
+              <a href="javascript:void(0)">{{ _gettext('Edit') }}</a>
+          </li>
+        </ul>
+      {% endblock %}
+
       {{ lib.render_form(form, return_url, extra(), form_opts,
                          action=url_for('.edit_view', id=request.args.get('id'), url=return_url),
                          is_modal=admin_view.edit_modal) }}
