@@ -1,8 +1,10 @@
 import warnings
 import re
+import csv
+import datetime
 
 from flask import (request, redirect, flash, abort, json, Response,
-                   get_flashed_messages)
+                   get_flashed_messages, stream_with_context)
 from jinja2 import contextfunction
 from wtforms.fields import HiddenField
 from wtforms.fields.core import UnboundField
@@ -94,6 +96,9 @@ class BaseModelView(BaseView, ActionsMixin):
         Setting this to true will enable the details view. This is recommended
         when there are too many columns to display in the list_view.
     """
+
+    can_export = False
+    """Is model list export allowed"""
 
     # Templates
     list_template = 'admin/model/list.html'
@@ -577,6 +582,12 @@ class BaseModelView(BaseView, ActionsMixin):
 
             class MyModelView(BaseModelView):
                 action_disallowed_list = ['delete']
+    """
+
+    # Export settings
+    export_max_rows = None
+    """
+        Maximum number of rows allowed for export.
     """
 
     # Various settings
@@ -1214,7 +1225,8 @@ class BaseModelView(BaseView, ActionsMixin):
         return None
 
     # Database-related API
-    def get_list(self, page, sort_field, sort_desc, search, filters):
+    def get_list(self, page, sort_field, sort_desc, search, filters,
+                 page_size=None):
         """
             Return a paginated and sorted list of models from the data source.
 
@@ -1231,6 +1243,10 @@ class BaseModelView(BaseView, ActionsMixin):
             :param filters:
                 List of filter tuples. First value in a tuple is a search
                 index, second value is a search value.
+            :param page_size:
+                Number of results. Defaults to ModelView's page_size. Can be
+                overriden to change the page_size limit. Removing the page_size
+                limit requires setting page_size to 0 or False.
         """
         raise NotImplementedError('Please implement get_list method')
 
@@ -1822,6 +1838,72 @@ class BaseModelView(BaseView, ActionsMixin):
             Mass-model action view.
         """
         return self.handle_action()
+
+    @expose('/export/csv/')
+    def export_csv(self):
+        return_url = get_redirect_target() or self.get_url('.index_view')
+
+        if not self.can_export:
+            flash(gettext('Permission denied.'))
+            return redirect(return_url)
+
+        # Grab parameters from URL
+        view_args = self._get_list_extra_args()
+
+        # Map column index to column name
+        sort_column = self._get_column_by_idx(view_args.sort)
+        if sort_column is not None:
+            sort_column = sort_column[0]
+
+        # Get count and data
+        count, data = self.get_list(0, sort_column,
+                                    view_args.sort_desc, view_args.search,
+                                    view_args.filters,
+                                    page_size=self.export_max_rows)
+
+        # https://docs.djangoproject.com/en/1.8/howto/outputting-csv/
+        class Echo(object):
+            """
+            An object that implements just the write method of the file-like
+            interface.
+            """
+            def write(self, value):
+                """
+                Write the value by returning it, instead of storing
+                in a buffer.
+                """
+                return value
+
+        writer = csv.writer(Echo())
+
+        def get_row_values(item):
+            # self._get_field_value(rec, c)
+            return [self._get_field_value(item, c[0])
+                    for c in self._list_columns]
+
+        def generate():
+            for num, row in enumerate(data):
+
+                # Append the column titles at the beginning
+                if num == 0:
+                    yield writer.writerow([c[1] for c in self._list_columns])
+
+                yield writer.writerow(get_row_values(row))
+
+        filename = '{}_{}.csv'.format(
+            self.__class__.__name__,
+            datetime.datetime.now().strftime("%Y_%m_%d_%H_%M")
+        )
+
+        headers = {
+            'Content-Disposition': 'attachment;filename={}'.format(filename)
+        }
+
+        return Response(
+            stream_with_context(generate()),
+            headers=headers,
+            mimetype='text/csv'
+        )
 
     @expose('/ajax/lookup/')
     def ajax_lookup(self):
