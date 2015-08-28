@@ -27,7 +27,6 @@ from .helpers import prettify_name, get_mdict_item_or_list
 from .ajax import AjaxModelLoader
 from .fields import ListEditableFieldList
 
-
 # Used to generate filter query string name
 filter_char_re = re.compile('[^a-z0-9 ]')
 filter_compact_re = re.compile(' +')
@@ -205,10 +204,11 @@ class BaseModelView(BaseView, ActionsMixin):
     """
         Dictionary of value type formatters to be used in the list view.
 
-        By default, two types are formatted:
+        By default, three types are formatted:
 
         1. ``None`` will be displayed as an empty string
         2. ``bool`` will be displayed as a checkmark if it is ``True``
+        3. ``list`` will be joined using ', '
 
         If you don't like the default behavior and don't want any type formatters
         applied, just override this property with an empty dictionary::
@@ -242,6 +242,18 @@ class BaseModelView(BaseView, ActionsMixin):
                 # `view` is current administrative view
                 # `value` value to format
                 pass
+    """
+
+    column_type_formatters_export = None
+    """
+        Dictionary of value type formatters to be used in the export.
+
+        By default, two types are formatted:
+
+        1. ``None`` will be displayed as an empty string
+        2. ``list`` will be joined using ', '
+
+        Functions the same way as column_type_formatters.
     """
 
     column_labels = ObsoleteAttr('column_labels', 'rename_columns', None)
@@ -748,6 +760,9 @@ class BaseModelView(BaseView, ActionsMixin):
         # Type formatters
         if self.column_type_formatters is None:
             self.column_type_formatters = dict(typefmt.BASE_FORMATTERS)
+
+        if self.column_type_formatters_export is None:
+            self.column_type_formatters_export = dict(typefmt.EXPORT_FORMATTERS)
 
         if self.column_descriptions is None:
             self.column_descriptions = dict()
@@ -1523,9 +1538,32 @@ class BaseModelView(BaseView, ActionsMixin):
             :param name:
                 Field name
         """
+        return self._get_list_value(
+            context,
+            model,
+            name,
+            self.column_type_formatters
+        )
+
+    def _get_list_value(self, context, model, name, column_type_formatters):
+        """
+            Returns the value to be displayed.
+
+            :param context:
+                :py:class:`jinja2.runtime.Context` if available
+            :param model:
+                Model instance
+            :param name:
+                Field name
+            :param column_type_formatters:
+                column_type_formatters to be used.
+        """
         column_fmt = self.column_formatters.get(name)
         if column_fmt is not None:
-            value = column_fmt(self, context, model, name)
+            if context is not None:
+                value = column_fmt(self, context, model, name)
+            else:
+                value = column_fmt(self, None, model, name)
         else:
             value = self._get_field_value(model, name)
 
@@ -1534,7 +1572,7 @@ class BaseModelView(BaseView, ActionsMixin):
             return choices_map.get(value) or value
 
         type_fmt = None
-        for typeobj, formatter in self.column_type_formatters.items():
+        for typeobj, formatter in column_type_formatters.items():
             if isinstance(value, typeobj):
                 type_fmt = formatter
                 break
@@ -1542,6 +1580,22 @@ class BaseModelView(BaseView, ActionsMixin):
             value = type_fmt(self, value)
 
         return value
+
+    def get_export_value(self, model, name):
+        """
+            Returns the value to be displayed in the export
+
+            :param model:
+                Model instance
+            :param name:
+                Field name
+        """
+        return self._get_list_value(
+            None,
+            model,
+            name,
+            self.column_type_formatters_export
+        )
 
     # AJAX references
     def _process_ajax_references(self):
@@ -1849,6 +1903,15 @@ class BaseModelView(BaseView, ActionsMixin):
             flash(gettext('Permission denied.'))
             return redirect(return_url)
 
+        # Macros in column_formatters are not supported.
+        # Macros will have a function name 'inner'
+        # This causes non-macro functions named 'inner' not work.
+        for col, func in iteritems(self.column_formatters):
+            if func.__name__ == 'inner':
+                raise NotImplementedError(
+                    'Macros not implemented.  Column: {}'.format(col)
+                )
+
         # Grab parameters from URL
         view_args = self._get_list_extra_args()
 
@@ -1880,7 +1943,7 @@ class BaseModelView(BaseView, ActionsMixin):
 
         def get_row_values(item):
             # self._get_field_value(rec, c)
-            return [self._get_field_value(item, c[0])
+            return [self.get_export_value(item, c[0])
                     for c in self._list_columns]
 
         def generate():
