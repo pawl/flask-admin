@@ -1526,6 +1526,39 @@ class BaseModelView(BaseView, ActionsMixin):
         """
         return rec_getattr(model, name)
 
+    def _get_list_value(self, context, model, name, column_type_formatters):
+        """
+            Returns the value to be displayed.
+
+            :param context:
+                :py:class:`jinja2.runtime.Context` if available
+            :param model:
+                Model instance
+            :param name:
+                Field name
+            :param column_type_formatters:
+                column_type_formatters to be used.
+        """
+        column_fmt = self.column_formatters.get(name)
+        if column_fmt is not None:
+            value = column_fmt(self, context, model, name)
+        else:
+            value = self._get_field_value(model, name)
+
+        choices_map = self._column_choices_map.get(name, {})
+        if choices_map:
+            return choices_map.get(value) or value
+
+        type_fmt = None
+        for typeobj, formatter in column_type_formatters.items():
+            if isinstance(value, typeobj):
+                type_fmt = formatter
+                break
+        if type_fmt is not None:
+            value = type_fmt(self, value)
+
+        return value
+
     @contextfunction
     def get_list_value(self, context, model, name):
         """
@@ -1545,45 +1578,10 @@ class BaseModelView(BaseView, ActionsMixin):
             self.column_type_formatters
         )
 
-    def _get_list_value(self, context, model, name, column_type_formatters):
-        """
-            Returns the value to be displayed.
-
-            :param context:
-                :py:class:`jinja2.runtime.Context` if available
-            :param model:
-                Model instance
-            :param name:
-                Field name
-            :param column_type_formatters:
-                column_type_formatters to be used.
-        """
-        column_fmt = self.column_formatters.get(name)
-        if column_fmt is not None:
-            if context is not None:
-                value = column_fmt(self, context, model, name)
-            else:
-                value = column_fmt(self, None, model, name)
-        else:
-            value = self._get_field_value(model, name)
-
-        choices_map = self._column_choices_map.get(name, {})
-        if choices_map:
-            return choices_map.get(value) or value
-
-        type_fmt = None
-        for typeobj, formatter in column_type_formatters.items():
-            if isinstance(value, typeobj):
-                type_fmt = formatter
-                break
-        if type_fmt is not None:
-            value = type_fmt(self, value)
-
-        return value
-
     def get_export_value(self, model, name):
         """
-            Returns the value to be displayed in the export
+            Returns the value to be displayed in export.
+            Allows export to use different (non HTML) formatters.
 
             :param model:
                 Model instance
