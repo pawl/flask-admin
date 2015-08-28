@@ -1921,9 +1921,8 @@ class BaseModelView(BaseView, ActionsMixin):
             sort_column = sort_column[0]
 
         # Get count and data
-        count, data = self.get_list(0, sort_column,
-                                    view_args.sort_desc, view_args.search,
-                                    view_args.filters,
+        count, data = self.get_list(0, sort_column, view_args.sort_desc,
+                                    view_args.search, view_args.filters,
                                     page_size=self.export_max_rows)
 
         # https://docs.djangoproject.com/en/1.8/howto/outputting-csv/
@@ -1941,17 +1940,19 @@ class BaseModelView(BaseView, ActionsMixin):
 
         writer = csv.writer(Echo())
 
-        def get_row_values(item):
-            # self._get_field_value(rec, c)
-            return [self.get_export_value(item, c[0])
-                    for c in self._list_columns]
-
         def generate():
+            # Needed as python 2 csvwriter does not support unicode
+            def fix_unicode(t):
+                return as_unicode(t).encode('utf-8')
+
             # Append the column titles at the beginning
-            yield writer.writerow([c[1] for c in self._list_columns])
+            titles = [fix_unicode(c[1]) for c in self._list_columns]
+            yield writer.writerow(titles)
 
             for row in data:
-                yield writer.writerow(get_row_values(row))
+                vals = [fix_unicode(self.get_export_value(row, c[0]))
+                        for c in self._list_columns]
+                yield writer.writerow(vals)
 
         filename = '{}_{}.csv'.format(
             self.name,
