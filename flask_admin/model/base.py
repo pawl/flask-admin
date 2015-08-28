@@ -1895,6 +1895,9 @@ class BaseModelView(BaseView, ActionsMixin):
 
     @expose('/export/csv/')
     def export_csv(self):
+        """
+            Export a CSV of records.
+        """
         return_url = get_redirect_target() or self.get_url('.index_view')
 
         if not self.can_export:
