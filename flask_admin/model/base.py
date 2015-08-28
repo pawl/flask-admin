@@ -1,7 +1,9 @@
 import warnings
 import re
 import csv
-import datetime
+import time
+
+from werkzeug import secure_filename
 
 from flask import (request, redirect, flash, abort, json, Response,
                    get_flashed_messages, stream_with_context)
@@ -1882,26 +1884,22 @@ class BaseModelView(BaseView, ActionsMixin):
                     for c in self._list_columns]
 
         def generate():
-            for num, row in enumerate(data):
+            # Append the column titles at the beginning
+            yield writer.writerow([c[1] for c in self._list_columns])
 
-                # Append the column titles at the beginning
-                if num == 0:
-                    yield writer.writerow([c[1] for c in self._list_columns])
-
+            for row in data:
                 yield writer.writerow(get_row_values(row))
 
         filename = '{}_{}.csv'.format(
-            self.__class__.__name__,
-            datetime.datetime.now().strftime("%Y_%m_%d_%H_%M")
+            self.name,
+            time.strftime("%Y-%m-%d_%H-%M-%S")
         )
 
-        headers = {
-            'Content-Disposition': 'attachment;filename={}'.format(filename)
-        }
+        disposition = 'attachment;filename={}'.format(secure_filename(filename))
 
         return Response(
             stream_with_context(generate()),
-            headers=headers,
+            headers={'Content-Disposition': disposition},
             mimetype='text/csv'
         )
 
