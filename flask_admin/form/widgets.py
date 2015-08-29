@@ -48,8 +48,7 @@ class DatePickerWidget(widgets.TextInput):
     def __call__(self, field, **kwargs):
         kwargs.setdefault('data-role', u'datepicker')
         kwargs.setdefault('data-date-format', u'YYYY-MM-DD')
-
-        self.date_format = kwargs['data-date-format']
+        kwargs.setdefault('data-min-date', u'1900-01-01')
         return super(DatePickerWidget, self).__call__(field, **kwargs)
 
 
@@ -62,6 +61,8 @@ class DateTimePickerWidget(widgets.TextInput):
     def __call__(self, field, **kwargs):
         kwargs.setdefault('data-role', u'datetimepicker')
         kwargs.setdefault('data-date-format', u'YYYY-MM-DD HH:mm:ss')
+        # dates before 1900 break wtforms (as of version 2.0.2)
+        kwargs.setdefault('data-min-date', u'1900-01-01')
         return super(DateTimePickerWidget, self).__call__(field, **kwargs)
 
 
