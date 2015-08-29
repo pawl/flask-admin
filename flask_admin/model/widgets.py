@@ -125,12 +125,15 @@ class XEditableWidget(object):
             kwargs['data-type'] = 'combodate'
             kwargs['data-format'] = 'YYYY-MM-DD'
             kwargs['data-template'] = 'YYYY-MM-DD'
+            # dates before 1900 break wtforms (as of version 2.0.2)
+            kwargs['data-combodate'] = '{"minYear": "1900"}'
         elif subfield.type == 'DateTimeField':
             kwargs['data-type'] = 'combodate'
             kwargs['data-format'] = 'YYYY-MM-DD HH:mm:ss'
             kwargs['data-template'] = 'YYYY-MM-DD  HH:mm:ss'
             # x-editable-combodate uses 1 minute increments
             kwargs['data-role'] = 'x-editable-combodate'
+            kwargs['data-combodate'] = '{"minYear": "1900"}'
         elif subfield.type == 'TimeField':
             kwargs['data-type'] = 'combodate'
             kwargs['data-format'] = 'HH:mm:ss'
