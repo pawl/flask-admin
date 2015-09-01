@@ -631,12 +631,14 @@ def test_export_csv():
         "col1_2,4\r\n"
         ",6\r\n" == data)
 
-    # test column_formatters_export
+    # test column_formatters_export and column_formatters_export
+    type_formatters = {type(None): lambda view, value: "null"}
+
     view = MockModelView(
         Model, view_data, can_export=True, column_list=['col1', 'col2'],
-        column_labels={'col1': 'Str Field', 'col2': 'Int Field'},
         column_formatters_export=dict(col2=lambda v, c, m, p: m.col2*3),
-        column_formatters=dict(col2=lambda v, c, m, p: m.col2*2),
+        column_formatters=dict(col2=lambda v, c, m, p: m.col2*2),  # overridden
+        column_type_formatters_export=type_formatters,
         endpoint="export_types_and_formatters"
     )
     admin.add_view(view)
@@ -644,7 +646,7 @@ def test_export_csv():
     rv = client.get('/admin/export_types_and_formatters/export/csv/')
     data = rv.data.decode('utf-8')
     eq_(rv.status_code, 200)
-    ok_("Str Field,Int Field\r\n"
+    ok_("Col1,Col2\r\n"
         "col1_1,3\r\n"
         "col1_2,6\r\n"
-        ",9\r\n" == data)
+        "null,9\r\n" == data)
