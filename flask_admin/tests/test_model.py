@@ -12,6 +12,7 @@ from wtforms import fields
 from flask_admin import Admin, form
 from flask_admin._compat import iteritems, itervalues
 from flask_admin.model import base, filters
+from flask_admin.model.template import macro
 from itertools import islice
 
 
@@ -650,3 +651,15 @@ def test_export_csv():
         "col1_1,3\r\n"
         "col1_2,6\r\n"
         "null,9\r\n" == data)
+
+    # Macros are not implemented for csv export yet and will throw an error
+    view = MockModelView(
+        Model, can_export=True, column_list=['col1', 'col2'],
+        column_formatters=dict(col1=macro('render_macro')),
+        endpoint="macro_exception"
+    )
+    admin.add_view(view)
+
+    rv = client.get('/admin/macro_exception/export/csv/')
+    data = rv.data.decode('utf-8')
+    eq_(rv.status_code, 500)
