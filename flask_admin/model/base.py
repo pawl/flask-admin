@@ -200,6 +200,16 @@ class BaseModelView(BaseView, ActionsMixin):
                 pass
     """
 
+    column_formatters_export = None
+    """
+        Dictionary of list view column formatters to be used for export.
+
+        Defaults to column_formatters when set to None.
+
+        Functions the same way as column_formatters except
+        that macros are not supported.
+    """
+
     column_type_formatters = ObsoleteAttr('column_type_formatters', 'list_type_formatters', None)
     """
         Dictionary of value type formatters to be used in the list view.
@@ -756,6 +766,10 @@ class BaseModelView(BaseView, ActionsMixin):
             ])
         else:
             self.column_choices = self._column_choices_map = dict()
+
+        # Column formatters
+        if self.column_formatters_export is None:
+            self.column_formatters_export = self.column_formatters
 
         # Type formatters
         if self.column_type_formatters is None:
@@ -1526,7 +1540,8 @@ class BaseModelView(BaseView, ActionsMixin):
         """
         return rec_getattr(model, name)
 
-    def _get_list_value(self, context, model, name, column_type_formatters):
+    def _get_list_value(self, context, model, name, column_formatters,
+                        column_type_formatters):
         """
             Returns the value to be displayed.
 
@@ -1536,10 +1551,12 @@ class BaseModelView(BaseView, ActionsMixin):
                 Model instance
             :param name:
                 Field name
+            :param column_formatters:
+                column_formatters to be used.
             :param column_type_formatters:
                 column_type_formatters to be used.
         """
-        column_fmt = self.column_formatters.get(name)
+        column_fmt = column_formatters.get(name)
         if column_fmt is not None:
             value = column_fmt(self, context, model, name)
         else:
@@ -1575,7 +1592,8 @@ class BaseModelView(BaseView, ActionsMixin):
             context,
             model,
             name,
-            self.column_type_formatters
+            self.column_formatters,
+            self.column_type_formatters,
         )
 
     def get_export_value(self, model, name):
@@ -1592,7 +1610,8 @@ class BaseModelView(BaseView, ActionsMixin):
             None,
             model,
             name,
-            self.column_type_formatters_export
+            self.column_formatters_export,
+            self.column_type_formatters_export,
         )
 
     # AJAX references
