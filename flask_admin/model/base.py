@@ -1929,7 +1929,8 @@ class BaseModelView(BaseView, ActionsMixin):
         for col, func in iteritems(self.column_formatters):
             if func.__name__ == 'inner':
                 raise NotImplementedError(
-                    'Macros not implemented.  Column: %s' % (col,)
+                    'Macros not implemented. Override with '
+                    'column_formatters_export. Column: %s' % (col,)
                 )
 
         # Grab parameters from URL
