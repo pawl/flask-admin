@@ -369,8 +369,15 @@
                   format: $el.attr('data-date-format')
                 },
                 function(start, end) {
-                    $('.filter-val').trigger("change");
+                  $('.filter-val').trigger("change");
+
+                  // a different input is used for timezone=True fields (for UTC)
+                  if ($el.attr('data-utc-input')) {
+                    var newUTC = this.startDate.utc().format(this.format);
+                    $('#' + $el.attr('data-utc-input')).val(newUTC);
+                  }
                 });
+
                 $el.on('show.daterangepicker', function (event, data) {
                   if ($el.val() == "") {
                     var now = moment().seconds(0); // set seconds to 0
@@ -378,6 +385,12 @@
                     $el.data('daterangepicker').setCustomDates(now, now);
                   }
                 });
+
+                if ($el.attr('data-utc-input')) {
+                  // set hidden input value when form is initalized
+                  $('#' + $el.attr('data-utc-input')).val($el.val());
+                }
+
                 return true;
             case 'datetimerangepicker':
                 $el.daterangepicker({

@@ -308,12 +308,18 @@ class AdminModelConverter(ModelConverterBase):
         return fields.DateField(**field_args)
 
     @converts('DateTime')  # includes TIMESTAMP
-    def convert_datetime(self, field_args, **extra):
-        return form.DateTimeField(**field_args)
+    def convert_datetime(self, column, field_args, **extra):
+        if getattr(column.type, 'timezone', False):
+            return form.UTCDateTimeField(**field_args)
+        else:
+            return form.DateTimeField(**field_args)
 
     @converts('Time')
-    def convert_time(self, field_args, **extra):
-        return form.TimeField(**field_args)
+    def convert_time(self, column, field_args, **extra):
+        if getattr(column.type, 'timezone', False):
+            return form.UTCTimeField(**field_args)
+        else:
+            return form.TimeField(**field_args)
 
     @converts('Integer')  # includes BigInteger and SmallInteger
     def handle_integer_types(self, column, field_args, **extra):

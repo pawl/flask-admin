@@ -1,17 +1,20 @@
 import time
 import datetime
 
-from wtforms import fields, widgets
+from wtforms import fields
 from flask_admin.babel import gettext
 from flask_admin._compat import text_type, as_unicode
+from flask_admin._backwards import utc
 
 from . import widgets as admin_widgets
 
 """
-An understanding of WTForms's Custom Widgets is helpful for understanding this code: http://wtforms.simplecodes.com/docs/0.6.2/widgets.html#custom-widgets
+An understanding of WTForms's Custom Widgets is helpful for understanding this
+code: http://wtforms.simplecodes.com/docs/0.6.2/widgets.html#custom-widgets
 """
 
-__all__ = ['DateTimeField', 'TimeField', 'Select2Field', 'Select2TagsField']
+__all__ = ['DateTimeField', 'TimeField', 'Select2Field', 'Select2TagsField',
+           'UTCDateTimeField', 'UTCTimeField']
 
 
 class DateTimeField(fields.DateTimeField):
@@ -19,6 +22,7 @@ class DateTimeField(fields.DateTimeField):
        Allows modifying the datetime format of a DateTimeField using form_args.
     """
     widget = admin_widgets.DateTimePickerWidget()
+
     def __init__(self, label=None, validators=None, format=None, **kwargs):
         """
             Constructor
@@ -35,6 +39,21 @@ class DateTimeField(fields.DateTimeField):
         super(DateTimeField, self).__init__(label, validators, **kwargs)
 
         self.format = format or '%Y-%m-%d %H:%M:%S'
+
+
+class UTCDateTimeField(DateTimeField):
+    widget = admin_widgets.UTCDateTimePickerWidget()
+
+    def process_formdata(self, valuelist):
+        super(UTCDateTimeField, self).process_formdata(valuelist)
+        if self.data is not None:
+            self.data = self.data.replace(tzinfo=utc)
+
+    def _value(self):
+        """ Convert datetime to UTC before sending to the front end """
+        if self.data is not None:
+            self.data = self.data.astimezone(utc)
+        return super(UTCDateTimeField, self)._value()
 
 
 class TimeField(fields.Field):
@@ -94,6 +113,24 @@ class TimeField(fields.Field):
                 raise ValueError(gettext('Invalid time format'))
             else:
                 self.data = None
+
+
+class UTCTimeField(TimeField):
+    widget = admin_widgets.UTCTimePickerWidget()
+
+    def process_formdata(self, valuelist):
+        super(UTCTimeField, self).process_formdata(valuelist)
+        if self.data is not None:
+            self.data = self.data.replace(tzinfo=utc)
+
+    def _value(self):
+        """ Convert time to UTC before sending to the front end """
+        if self.data is not None:
+            # time has no astimezone, need to create datetime
+            dt = datetime.datetime.combine(datetime.date.today(), self.data)
+            utc_dt = dt.astimezone(utc)
+            self.data = utc_dt.time()
+        return super(UTCTimeField, self)._value()
 
 
 class Select2Field(fields.SelectField):

@@ -8,6 +8,8 @@
 import sys
 import warnings
 
+from datetime import tzinfo, timedelta
+
 
 def get_property(obj, name, old_name, default=None):
     """
@@ -57,6 +59,21 @@ class ObsoleteAttr(object):
 
     def __set__(self, obj, value):
         setattr(obj, self.cache, value)
+
+
+class UTC(tzinfo):
+    """ UTC tzinfo object from the Python docs, doesn't require pytz """
+    def utcoffset(self, dt):
+        return timedelta(0)
+
+    def tzname(self, dt):
+        return "UTC"
+
+    def dst(self, dt):
+        return timedelta(0)
+
+
+utc = UTC()  # only use this initialized object as a tzinfo argument
 
 
 class ImportRedirect(object):

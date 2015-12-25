@@ -3,19 +3,16 @@ from flask.globals import _request_ctx_stack
 from flask_admin.babel import gettext, ngettext
 from flask_admin import helpers as h
 
-__all__ = ['Select2Widget', 'DatePickerWidget', 'DateTimePickerWidget', 'RenderTemplateWidget', 'Select2TagsWidget', ]
-
-
-def _is_bootstrap3():
-    view = h.get_current_view()
-    return view and view.admin.template_mode == 'bootstrap3'
+__all__ = ['Select2Widget', 'DatePickerWidget', 'DateTimePickerWidget',
+           'RenderTemplateWidget', 'Select2TagsWidget', 'UTCTimePickerWidget',
+           'UTCDateTimePickerWidget', 'TimePickerWidget']
 
 
 class Select2Widget(widgets.Select):
     """
         `Select2 <https://github.com/ivaynberg/select2>`_ styled select widget.
 
-        You must include select2.js, form-x.x.x.js and select2 stylesheet for it to
+        You must include select2.js, form.js and select2 stylesheet for it to
         work.
     """
     def __call__(self, field, **kwargs):
@@ -30,7 +27,7 @@ class Select2Widget(widgets.Select):
 
 class Select2TagsWidget(widgets.TextInput):
     """`Select2 <http://ivaynberg.github.com/select2/#tags>`_ styled text widget.
-    You must include select2.js, form-x.x.x.js and select2 stylesheet for it to work.
+    You must include select2.js, form.js and select2 stylesheet for it to work.
     """
     def __call__(self, field, **kwargs):
         kwargs.setdefault('data-role', u'select2')
@@ -38,43 +35,66 @@ class Select2TagsWidget(widgets.TextInput):
         return super(Select2TagsWidget, self).__call__(field, **kwargs)
 
 
+class UTCWidget(widgets.TextInput):
+    """ TextInput with a hidden input for UTC date/datetime/date values """
+    def __call__(self, field, **kwargs):
+        html = []
+
+        kwargs.setdefault('id', field.id)
+        kwargs.setdefault('type', self.input_type)
+        if 'value' not in kwargs:
+            kwargs['value'] = field._value()
+
+        kwargs.setdefault('data-role', u'datetimepicker')
+        kwargs.setdefault('data-date-format', u'YYYY-MM-DD HH:mm:ss')
+
+        # create id for hidden input (for UTC)
+        utc_id = kwargs['id'] + '-utc'
+        kwargs.setdefault('data-utc-input', utc_id)
+
+        # remove "name" from 1st input field, so values aren't processed
+        html.append('<input %s>' % self.html_params(**kwargs))
+
+        # this input's value is set by form.js as UTC, it will be processed
+        html.append('<input %s>' % self.html_params(id=utc_id,
+                                                    name=field.name,
+                                                    type="hidden"))
+
+        return widgets.HTMLString(' '.join(html))
+
 
 class DatePickerWidget(widgets.TextInput):
-    """
-        Date picker widget.
-
-        You must include bootstrap-datepicker.js and form-x.x.x.js for styling to work.
-    """
+    """ Date picker widget. Requires: daterangepicker.js and form.js """
     def __call__(self, field, **kwargs):
         kwargs.setdefault('data-role', u'datepicker')
         kwargs.setdefault('data-date-format', u'YYYY-MM-DD')
-
-        self.date_format = kwargs['data-date-format']
         return super(DatePickerWidget, self).__call__(field, **kwargs)
 
 
 class DateTimePickerWidget(widgets.TextInput):
-    """
-        Datetime picker widget.
-
-        You must include bootstrap-datepicker.js and form-x.x.x.js for styling to work.
-    """
+    """ Datetime picker widget. Requires: daterangepicker.js and form.js """
     def __call__(self, field, **kwargs):
         kwargs.setdefault('data-role', u'datetimepicker')
         kwargs.setdefault('data-date-format', u'YYYY-MM-DD HH:mm:ss')
         return super(DateTimePickerWidget, self).__call__(field, **kwargs)
 
 
-class TimePickerWidget(widgets.TextInput):
-    """
-        Date picker widget.
+class UTCDateTimePickerWidget(DateTimePickerWidget, UTCWidget):
+    """ DateTimePickerWidget with hidden field for UTC """
+    pass
 
-        You must include bootstrap-datepicker.js and form-x.x.x.js for styling to work.
-    """
+
+class TimePickerWidget(widgets.TextInput):
+    """ Time picker widget. Requires: daterangepicker.js and form.js """
     def __call__(self, field, **kwargs):
         kwargs.setdefault('data-role', u'timepicker')
         kwargs.setdefault('data-date-format', u'HH:mm:ss')
         return super(TimePickerWidget, self).__call__(field, **kwargs)
+
+
+class UTCTimePickerWidget(TimePickerWidget, UTCWidget):
+    """ TimePickerWidget with hidden field for UTC """
+    pass
 
 
 class RenderTemplateWidget(object):
