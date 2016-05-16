@@ -257,7 +257,7 @@ class FilterConverter(filters.BaseFilterConverter):
     float_filters = (FloatEqualFilter, FloatNotEqualFilter, FloatGreaterFilter,
                      FloatSmallerFilter, FilterEmpty, FloatInListFilter,
                      FloatNotInListFilter)
-    bool_filters = (BooleanEqualFilter, BooleanNotEqualFilter)
+    bool_filters = (BooleanEqualFilter, BooleanNotEqualFilter, FilterEmpty)
     datetime_filters = (DateTimeEqualFilter, DateTimeNotEqualFilter,
                         DateTimeGreaterFilter, DateTimeSmallerFilter,
                         DateTimeBetweenFilter, DateTimeNotBetweenFilter,

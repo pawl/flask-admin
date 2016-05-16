@@ -625,15 +625,16 @@ def test_column_filters():
         [
             (28, u'equals'),
             (29, u'not equal'),
+            (30, u'empty'),
         ])
 
     eq_([(f['index'], f['operation']) for f in view._filter_groups[u'Model1 / Enum Field']],
         [
-            (30, u'equals'),
-            (31, u'not equal'),
-            (32, u'empty'),
-            (33, u'in list'),
-            (34, u'not in list'),
+            (31, u'equals'),
+            (32, u'not equal'),
+            (33, u'empty'),
+            (34, u'in list'),
+            (35, u'not in list'),
         ])
 
     # Test filter with a dot
@@ -644,6 +645,7 @@ def test_column_filters():
         [
             (0, 'equals'),
             (1, 'not equal'),
+            (2, 'empty'),
         ])
 
     # Test column_labels on filters
@@ -869,6 +871,7 @@ def test_column_filters():
         [
             (0, 'equals'),
             (1, 'not equal'),
+            (2, 'empty'),
         ])
 
     # boolean - equals - Yes
@@ -902,6 +905,22 @@ def test_column_filters():
     ok_('test2_val_1' in data)
     ok_('test2_val_2' not in data)
     ok_('test2_val_3' not in data)
+
+    # boolean - empty - Yes
+    rv = client.get('/admin/_bools/?flt0_2=1')
+    eq_(rv.status_code, 200)
+    data = rv.data.decode('utf-8')
+    ok_('test2_val_1' not in data)
+    ok_('test2_val_2' not in data)
+    ok_('test2_val_3' not in data)
+
+    # boolean - empty - No
+    rv = client.get('/admin/_bools/?flt0_2=0')
+    eq_(rv.status_code, 200)
+    data = rv.data.decode('utf-8')
+    ok_('test2_val_1' in data)
+    ok_('test2_val_2' in data)
+    ok_('test2_val_3' in data)
 
     # Test float filter
     view = CustomModelView(Model2, db.session, column_filters=['float_field'],

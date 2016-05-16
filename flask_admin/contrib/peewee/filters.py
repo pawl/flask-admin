@@ -294,7 +294,7 @@ class FilterConverter(filters.BaseFilterConverter):
     float_filters = (FloatEqualFilter, FloatNotEqualFilter, FloatGreaterFilter,
                      FloatSmallerFilter, FilterEmpty, FloatInListFilter,
                      FloatNotInListFilter)
-    bool_filters = (BooleanEqualFilter, BooleanNotEqualFilter)
+    bool_filters = (BooleanEqualFilter, BooleanNotEqualFilter, FilterEmpty)
     date_filters = (DateEqualFilter, DateNotEqualFilter, DateGreaterFilter,
                     DateSmallerFilter, DateBetweenFilter, DateNotBetweenFilter,
                     FilterEmpty)

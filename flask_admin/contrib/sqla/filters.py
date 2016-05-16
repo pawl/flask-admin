@@ -297,7 +297,7 @@ class FilterConverter(filters.BaseFilterConverter):
     float_filters = (FloatEqualFilter, FloatNotEqualFilter, FloatGreaterFilter,
                      FloatSmallerFilter, FilterEmpty, FloatInListFilter,
                      FloatNotInListFilter)
-    bool_filters = (BooleanEqualFilter, BooleanNotEqualFilter)
+    bool_filters = (BooleanEqualFilter, BooleanNotEqualFilter, FilterEmpty)
     enum = (FilterEqual, FilterNotEqual, FilterEmpty, FilterInList,
             FilterNotInList)
     date_filters = (DateEqualFilter, DateNotEqualFilter, DateGreaterFilter,

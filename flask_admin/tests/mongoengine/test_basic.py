@@ -477,6 +477,7 @@ def test_column_filters():
         [
             (0, 'equals'),
             (1, 'not equal'),
+            (2, 'empty'),
         ])
 
     # boolean - equals - Yes
@@ -510,6 +511,20 @@ def test_column_filters():
     ok_('string_field_val_1' in data)
     ok_('string_field_val_2' not in data)
     #ok_('string_field_val_3' not in data)
+
+    # boolean - empty - Yes
+    rv = client.get('/admin/_bools/?flt0_2=1')
+    eq_(rv.status_code, 200)
+    data = rv.data.decode('utf-8')
+    ok_('string_field_val_1' not in data)
+    ok_('string_field_val_2' not in data)
+
+    # boolean - empty - No
+    rv = client.get('/admin/_bools/?flt0_2=0')
+    eq_(rv.status_code, 200)
+    data = rv.data.decode('utf-8')
+    ok_('string_field_val_1' in data)
+    ok_('string_field_val_2' in data)
 
     # Test float filter
     view = CustomModelView(Model2, column_filters=['float_field'],
