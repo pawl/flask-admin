@@ -255,7 +255,8 @@ class AdminModelConverter(ModelConverterBase):
             converter = self.get_converter(column)
 
             if converter is None:
-                return None
+                # default to StringField when unable to find a converter
+                converter = self.conv_String
 
             return converter(model=model, mapper=mapper, prop=prop,
                              column=column, field_args=kwargs)
@@ -537,7 +538,7 @@ class InlineModelConverter(InlineModelConverterBase):
     def _calculate_mapping_key_pair(self, model, info):
         """
             Calculate mapping property key pair between `model` and inline model,
-                including the forward one for `model` and the reverse one for inline model. 
+                including the forward one for `model` and the reverse one for inline model.
                 Override the method to map your own inline models.
 
             :param model:
